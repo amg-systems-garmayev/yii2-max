@@ -5,12 +5,11 @@ namespace garmayev\max;
 use garmayev\max\types\Update;
 use GuzzleHttp\Client;
 use yii\base\Component;
-use garmayev\max\types\Update;
 
 class Max extends Component
 {
     public string $access_token;
-    private string $base;
+    private string $base = "https://platform-api.max.ru/";
     private Client $client;
 
     public function init()
@@ -20,7 +19,7 @@ class Max extends Component
 
     public function setWebhook(string $url)
     {
-        $response = $this->client->request('POST', $this->base."/subscriptions", [
+        $response = $this->client->request('POST', $this->base."subscriptions", [
             'headers' => [
                 'Content-Type' => 'application/json',
                 'Authorization' => $this->access_token,
