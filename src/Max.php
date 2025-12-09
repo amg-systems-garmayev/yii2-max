@@ -9,6 +9,7 @@ use yii\base\Component;
 class Max extends Component
 {
     public string $access_token;
+  	public string $secret;
     private string $base = "https://platform-api.max.ru/";
     private Client $client;
 
