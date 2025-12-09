@@ -109,4 +109,13 @@ class Message extends Model
             $this->_markup[] = new Markup($markup);
         }
     }
+  
+  	public function getRecipient() {
+    	return $this->_recipient;
+    }
+  
+  	public function setRecipient($value):void
+    {
+    	$this->_recipient = $value;
+    }
 }
