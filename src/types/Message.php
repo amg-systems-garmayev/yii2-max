@@ -18,7 +18,7 @@ class Message extends Model
     private string $_text;
     private array $_attachments;
     private array $_markup;
-  	private _recipient;
+  	private $_recipient;
   
 
     /**
