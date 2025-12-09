@@ -2,8 +2,9 @@
     "name": "garmayev/yii2-max",
     "description": "Модуль для работы с MAX",
     "type": "yii2-extension",
-    "keywords": ["yii2","extension","max"],
-    "license": "MIT",
+    "keywords": ["yii2", "extension", "max"],
+    "license": "LGPL-3.0+",
+    "version": "dev-main",
     "authors": [
         {
             "name": "garmayev",
@@ -11,11 +12,17 @@
         }
     ],
     "require": {
-        "yiisoft/yii2": "~2.0.0"
+        "php": ">=7.4.0",
+        "yiisoft/yii2": "~2.0.0",
+        "guzzlehttp/guzzle": "^7.0",
+        "ext-json": "*"
     },
     "autoload": {
         "psr-4": {
-            "garmayev\\max\\": "src"
+            "garmayev\\max\\": "src/"
         }
+    },
+    "extra": {
+        "bootstrap": "garmayev\\max\\Bootstrap"
     }
 }

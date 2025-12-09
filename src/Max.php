@@ -2,9 +2,10 @@
 
 namespace garmayev\max;
 
+use garmayev\max\types\Update;
 use GuzzleHttp\Client;
 use yii\base\Component;
-use garmayev\max\Update;
+use garmayev\max\types\Update;
 
 class Max extends Component
 {
@@ -12,9 +13,14 @@ class Max extends Component
     private string $base;
     private Client $client;
 
+    public function init()
+    {
+        $this->client = new Client();
+    }
+
     public function setWebhook(string $url)
     {
-        $response = $this->client->request('POST', $url, [
+        $response = $this->client->request('POST', $this->base."/subscriptions", [
             'headers' => [
                 'Content-Type' => 'application/json',
                 'Authorization' => $this->access_token,
@@ -25,5 +31,6 @@ class Max extends Component
                 'secret' => ''
             ])
         ]);
+        \Yii::error($response->getBody()->getContents());
     }
 }

@@ -13,6 +13,13 @@ use yii\base\Model;
  */
 class Chat extends Model
 {
+    const TYPE_CHAT = "chat";
+
+    const STATUS_ACTIVE = "active";
+    const STATUS_REMOVED = "removed";
+    const STATUS_LEFT = "left";
+    const STATUS_CLOSED = "closed";
+
     public int $_chat_id;
     public string $_type;
     public string $_status;
