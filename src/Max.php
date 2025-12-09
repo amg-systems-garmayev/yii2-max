@@ -26,6 +26,7 @@ class Max extends Component
         $this->client = new Client();
         $data = json_decode(file_get_contents("php://input"), true);
         if ($data) {
+          	\Yii::error($data);
             $this->request = new Request($data);
         }
     }
