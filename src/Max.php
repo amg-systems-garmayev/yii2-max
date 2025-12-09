@@ -28,7 +28,7 @@ class Max extends Component
             'body' => json_encode([
                 'url' => $url,
                 'update_types' => [Update::TYPE_MESSAGE_CREATED, Update::TYPE_BOT_STARTED],
-                'secret' => ''
+                'secret' => $this->secret
             ])
         ]);
         \Yii::error($response->getBody()->getContents());
