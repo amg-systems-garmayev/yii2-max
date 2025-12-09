@@ -11,6 +11,16 @@ class Request extends Model
     private string $_user_locale;
     private string $_update_type;
 
+    public function rules()
+    {
+        return [
+            [['_timestamp'], 'integer'],
+            [['_user_locale', '_update_type'], 'string'],
+            [['_message'], 'safe'],
+            [['timestamp', 'message', 'user_locale', 'update_type'], 'safe'],
+        ];
+    }
+
     public function getTimestamp(): int
     {
         return $this->_timestamp;
