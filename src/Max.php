@@ -2,20 +2,32 @@
 
 namespace garmayev\max;
 
+use garmayev\max\types\Request;
+use garmayev\max\types\Response;
 use garmayev\max\types\Update;
 use GuzzleHttp\Client;
 use yii\base\Component;
 
+/**
+ * @property string $access_token
+ * @property string $secret
+ */
 class Max extends Component
 {
     public string $access_token;
   	public string $secret;
     private string $base = "https://platform-api.max.ru/";
     private Client $client;
+    public Request $request;
+    public Response $response;
 
     public function init()
     {
         $this->client = new Client();
+        $data = json_decode(file_get_contents("php://input"), true);
+        if ($data) {
+            $this->request = new Request($data);
+        }
     }
 
     public function setWebhook(string $url)
@@ -31,6 +43,6 @@ class Max extends Component
                 'secret' => $this->secret
             ])
         ]);
-        \Yii::error($response->getBody()->getContents());
+        $this->response = new Response($response);
     }
 }
