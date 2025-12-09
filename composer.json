@@ -1,0 +1,21 @@
+{
+    "name": "garmayev/yii2-max",
+    "description": "Модуль для работы с MAX",
+    "type": "yii2-extension",
+    "keywords": ["yii2","extension","max"],
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "garmayev",
+            "email": "garmayev@yandex.ru"
+        }
+    ],
+    "require": {
+        "yiisoft/yii2": "~2.0.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "garmayev\\max\\": "src"
+        }
+    }
+}
