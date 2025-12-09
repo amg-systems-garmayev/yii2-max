@@ -13,11 +13,13 @@ use yii\base\Model;
  */
 class Message extends Model
 {
-    public string $_mid;
-    public int $_seq;
-    public string $_text;
-    public array $_attachments;
-    public array $_markup;
+    private string $_mid;
+    private int $_seq;
+    private string $_text;
+    private array $_attachments;
+    private array $_markup;
+  	private _recipient;
+  
 
     /**
      * @return string
