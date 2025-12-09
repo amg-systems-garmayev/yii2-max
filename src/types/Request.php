@@ -36,9 +36,9 @@ class Request extends Model
         return $this->_message;
     }
 
-    public function setMessage(Message $message): void
+    public function setMessage(array $message): void
     {
-        $this->_message = $message;
+        $this->_message = new Message($message);
     }
 
     public function getUser_locale(): string
