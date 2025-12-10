@@ -11,9 +11,23 @@ use yii\base\Model;
  */
 class Payload extends Model
 {
+    public $_fileId;
     public $_photo_id;
     public $_token;
     public $_url;
+    public $_vcf_info;
+    private $_max_info;
+    private $_code;
+
+    public function getFileId()
+    {
+        return $this->_fileId;
+    }
+
+    public function setFileId($value)
+    {
+        return $this->_fileId;
+    }
 
     /**
      * @return int
@@ -61,5 +75,35 @@ class Payload extends Model
     public function setUrl($url): void
     {
         $this->_url = $url;
+    }
+
+    public function getVsf_info()
+    {
+        return $this->_vcf_info;
+    }
+
+    public function setVcf_info($value)
+    {
+        $this->_vcf_info = $value;
+    }
+
+    public function getMax_info()
+    {
+        return $this->_max_info;
+    }
+
+    public function setMax_info($value)
+    {
+        $this->_max_info = $value;
+    }
+
+    public function getCode()
+    {
+        return $this->_code;
+    }
+
+    public function setCode($value)
+    {
+        $this->_code = $value;
     }
 }

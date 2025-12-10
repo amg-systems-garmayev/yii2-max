@@ -2,48 +2,36 @@
 
 namespace garmayev\max;
 
-use garmayev\max\types\Request;
-use garmayev\max\types\Response;
 use garmayev\max\types\Update;
-use GuzzleHttp\Client;
-use yii\base\Component;
+use garmayev\max\types\MaxBase;
 
 /**
  * @property string $access_token
  * @property string $secret
  */
-class Max extends Component
+class Max extends MaxBase
 {
     public string $access_token;
-  	public string $secret;
+    public string $secret;
     private string $base = "https://platform-api.max.ru/";
-    private Client $client;
-    public Request $request;
-    public Response $response;
 
     public function init()
     {
-        $this->client = new Client();
-        $data = json_decode(file_get_contents("php://input"), true);
-        if ($data) {
-          	\Yii::error($data);
-            $this->request = new Request($data);
-        }
+        parent::init();
     }
 
     public function setWebhook(string $url)
     {
-        $response = $this->client->request('POST', $this->base."subscriptions", [
-            'headers' => [
-                'Content-Type' => 'application/json',
-                'Authorization' => $this->access_token,
-            ],
-            'body' => json_encode([
+        return $this->send('POST', 'subscriptions', [
                 'url' => $url,
-                'update_types' => [Update::TYPE_MESSAGE_CREATED, Update::TYPE_BOT_STARTED],
+                'update_types' => [Update::TYPE_MESSAGE_CREATED, Update::TYPE_MESSAGE_REMOVED, Update::TYPE_BOT_STARTED],
                 'secret' => $this->secret
-            ])
-        ]);
-        $this->response = new Response($response);
+            ]);
+    }
+
+    public function sendMessage($user_id, $params)
+    {
+//        \Yii::error(get_class_methods(MaxBase::class));
+        return parent::send('POST', "messages?user_id={$user_id}", $params);
     }
 }

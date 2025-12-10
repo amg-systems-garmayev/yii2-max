@@ -10,6 +10,10 @@ use yii\base\Model;
  * @property string $text
  * @property Attachment[] $attachments
  * @property Markup[] $markup
+ * @property Recipient $recipient
+ * @property int $timestamp
+ * @property MessageBody $body
+ * @property User $sender
  */
 class Message extends Model
 {
@@ -18,8 +22,10 @@ class Message extends Model
     private string $_text;
     private array $_attachments;
     private array $_markup;
-  	private $_recipient;
-  
+    private Recipient $_recipient;
+    private int $_timestamp;
+    private MessageBody $_body;
+    private User $_sender;
 
     /**
      * @return string
@@ -110,12 +116,42 @@ class Message extends Model
         }
     }
   
-  	public function getRecipient() {
-    	return $this->_recipient;
+    public function getRecipient() {
+        return $this->_recipient;
     }
   
-  	public function setRecipient($value):void
+    public function setRecipient($value):void
     {
-    	$this->_recipient = $value;
+        $this->_recipient = new Recipient($value);
+    }
+
+    public function getTimestamp()
+    {
+        return $this->_timestamp;
+    }
+
+    public function setTimestamp(int $value): void
+    {
+        $this->_timestamp = $value;
+    }
+
+    public function getBody()
+    {
+        return $this->_body;
+    }
+
+    public function setBody($value): void
+    {
+        $this->_body = new MessageBody($value);
+    }
+
+    public function getSender()
+    {
+        return $this->_sender;
+    }
+
+    public function setSender($value)
+    {
+        $this->_sender = new User($value);
     }
 }

@@ -10,6 +10,10 @@ class Request extends Model
     private Message $_message;
     private string $_user_locale;
     private string $_update_type;
+    private string $_message_id;
+    private $_chat_id;
+    private $_user_id;
+    private $_user;
 
     public function rules()
     {
@@ -59,5 +63,45 @@ class Request extends Model
     public function setUpdate_type(string $update_type): void
     {
         $this->_update_type = $update_type;
+    }
+
+    public function getMessage_id()
+    {
+        return $this->_message_id;
+    }
+
+    public function setMessage_id($value)
+    {
+        $this->_message_id = $value;
+    }
+
+    public function getChat_id()
+    {
+        return $this->_chat_id;
+    }
+
+    public function setChat_id($value)
+    {
+        $this->_chat_id = $value;
+    }
+
+    public function getUser_id()
+    {
+        return $this->_user_id;
+    }
+
+    public function setUser_id($value)
+    {
+        $this->_user_id = $value;
+    }
+
+    public function getUser()
+    {
+        return $this->_user;
+    }
+
+    public function setUser($value)
+    {
+        $this->_user = new User($value);
     }
 }
