@@ -19,11 +19,18 @@ class Payload extends Model
     private $_max_info;
     private $_code;
 
+    /**
+     * @return mixed
+     */
     public function getFileId()
     {
         return $this->_fileId;
     }
 
+    /**
+     * @param $value
+     * @return mixed
+     */
     public function setFileId($value)
     {
         return $this->_fileId;
@@ -77,31 +84,52 @@ class Payload extends Model
         $this->_url = $url;
     }
 
+    /**
+     * @return mixed
+     */
     public function getVsf_info()
     {
         return $this->_vcf_info;
     }
 
+    /**
+     * @param $value
+     * @return void
+     */
     public function setVcf_info($value)
     {
         $this->_vcf_info = $value;
     }
 
+    /**
+     * @return mixed
+     */
     public function getMax_info()
     {
         return $this->_max_info;
     }
 
+    /**
+     * @param $value
+     * @return void
+     */
     public function setMax_info($value)
     {
         $this->_max_info = $value;
     }
 
+    /**
+     * @return mixed
+     */
     public function getCode()
     {
         return $this->_code;
     }
 
+    /**
+     * @param $value
+     * @return void
+     */
     public function setCode($value)
     {
         $this->_code = $value;

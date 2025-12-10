@@ -26,6 +26,7 @@ class Message extends Model
     private int $_timestamp;
     private MessageBody $_body;
     private User $_sender;
+    private array $_callback_data = [];
 
     /**
      * @return string
@@ -153,5 +154,32 @@ class Message extends Model
     public function setSender($value)
     {
         $this->_sender = new User($value);
+    }
+    /**
+     * @return array
+     */
+    public function getCallbackData(): array
+    {
+        return $this->_callback_data;
+    }
+
+    /**
+     * @param array|string $value
+     * @return void
+     */
+    public function setCallbackData($value): void
+    {
+        if (is_string($value)) {
+            $value = json_decode($value, true) ?: [];
+        }
+        $this->_callback_data = is_array($value) ? $value : [];
+    }
+
+    /**
+     * Проверяет, является ли сообщение callback (нажатием кнопки)
+     */
+    public function isCallback(): bool
+    {
+        return !empty($this->_callback_data);
     }
 }
