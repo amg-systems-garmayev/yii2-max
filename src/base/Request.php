@@ -1,6 +1,6 @@
 <?php
 
-namespace garmayev\max\types;
+namespace garmayev\max\base;
 
 use yii\base\Model;
 

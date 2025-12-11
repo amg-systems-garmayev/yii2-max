@@ -15,7 +15,6 @@ class Max extends MaxBase
 {
     public string $access_token;
     public string $secret;
-    private string $base = "https://platform-api.max.ru/";
 
     /**
      * @var CallbackManager Менеджер обработки callback
