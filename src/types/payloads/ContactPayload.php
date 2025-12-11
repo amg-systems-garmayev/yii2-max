@@ -4,12 +4,13 @@ namespace garmayev\max\types\payloads;
 
 use yii\base\Model;
 
-class ContactPayload extends Model
+class ContactPayload extends Payload
 {
     private ?string $_name;
     private ?int $_contact_id;
-    private ?string $_vcf_info;
-    private ?string $_vcf_phone;
+    public string $_vcf_info;
+    public ?string $_vcf_phone;
+    public array $max_info;
 
     /**
      * @return string|null
@@ -31,7 +32,7 @@ class ContactPayload extends Model
     /**
      * @return int|null
      */
-    public function getContactId(): ?int
+    public function getContact_id(): ?int
     {
         return $this->_contact_id;
     }
@@ -40,7 +41,7 @@ class ContactPayload extends Model
      * @param int|null $contact_id
      * @return void
      */
-    public function setContactId(?int $contact_id): void
+    public function setContact_id(?int $contact_id): void
     {
         $this->_contact_id = $contact_id;
     }
@@ -48,7 +49,7 @@ class ContactPayload extends Model
     /**
      * @return string|null
      */
-    public function getVcfInfo(): ?string
+    public function getVcf_info(): ?string
     {
         return $this->_vcf_info;
     }
@@ -57,7 +58,7 @@ class ContactPayload extends Model
      * @param string|null $vcf_info
      * @return void
      */
-    public function setVcfInfo(?string $vcf_info): void
+    public function setVcf_info(?string $vcf_info): void
     {
         $this->_vcf_info = $vcf_info;
     }
@@ -65,7 +66,7 @@ class ContactPayload extends Model
     /**
      * @return string|null
      */
-    public function getVcfPhone(): ?string
+    public function getVcf_phone(): ?string
     {
         return $this->_vcf_phone;
     }
@@ -74,7 +75,7 @@ class ContactPayload extends Model
      * @param string|null $vcf_phone
      * @return void
      */
-    public function setVcfPhone(?string $vcf_phone): void
+    public function setVcf_phone(?string $vcf_phone): void
     {
         $this->_vcf_phone = $vcf_phone;
     }

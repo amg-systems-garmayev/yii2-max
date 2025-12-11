@@ -4,7 +4,7 @@ namespace garmayev\max\types\payloads;
 
 use yii\base\Model;
 
-class StickerPayload extends Model
+class StickerPayload extends Payload
 {
     private string $_code;
 

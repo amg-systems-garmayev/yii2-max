@@ -4,7 +4,7 @@ namespace garmayev\max\types\payloads;
 
 use yii\base\Model;
 
-class MediaPayload extends Model
+class MediaPayload extends Payload
 {
     private ?string $_token;
 

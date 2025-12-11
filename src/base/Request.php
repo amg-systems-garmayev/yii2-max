@@ -17,14 +17,14 @@ class Request extends Model
     private $_chat_id;
     private $_user_id;
     private User $_user;
-    private $_callback;
+    private Callback $_callback;
 
     public function rules()
     {
         return [
             [['_timestamp'], 'integer'],
-            [['_user_locale', '_update_type'], 'string'],
-            [['_message'], 'safe'],
+            [['_user_locale', '_update_type', '_message_id'], 'string'],
+            [['_message', '_callback', '_user', '_chat__id'], 'safe'],
             [['timestamp', 'message', 'user_locale', 'update_type', 'callback'], 'safe'],
         ];
     }

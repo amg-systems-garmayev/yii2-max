@@ -11,7 +11,7 @@ use garmayev\max\types\buttons\RequestContact;
 use garmayev\max\types\buttons\RequestGeoLocation;
 use yii\base\Model;
 
-class InlineKeyboardPayload extends Model
+class InlineKeyboardPayload extends Payload
 {
     private array $_buttons;
 

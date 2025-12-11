@@ -4,7 +4,6 @@ namespace garmayev\max;
 
 use garmayev\max\types\Update;
 use garmayev\max\base\MaxBase;
-use garmayev\max\CallbackManager;
 
 /**
  * @property string $access_token
@@ -15,7 +14,7 @@ class Max extends MaxBase
     public string $access_token;
     public string $secret;
 
-    public function setWebhook(string $url, arra $types)
+    public function setWebhook(string $url, array $types)
     {
         return parent::send('POST', 'subscriptions', [
             'url' => $url,
@@ -24,17 +23,17 @@ class Max extends MaxBase
         ]);
     }
 
-    public function sendMessage($args, $params)
+    public function sendMessage(array $args, array $params)
     {
         return parent::send('POST', "messages", $params, $args);
     }
 
-    public function editMessage($args, $params)
+    public function editMessage(array $args, array $params)
     {
-        return parent::send();
+        return parent::send('PUT', 'messages', $params, $args);
     }
 
-    public function answers($args, $params)
+    public function answers(array $args, array $params)
     {
         return parent::send('POST', 'answers', $params, $args);
     }

@@ -10,6 +10,7 @@ use garmayev\max\types\buttons\Link;
 use garmayev\max\types\buttons\RequestContact;
 use garmayev\max\types\buttons\RequestGeoLocation;
 use garmayev\max\types\buttons\Message;
+use garmayev\max\types\payloads\ContactPayload;
 
 /**
  * @property string $type
@@ -38,11 +39,11 @@ class Attachment extends Model
     {
         $this->type = $data['type'];
         if (isset($data['payload'])) {
-            $this->payload = $data['payload'];
+            $this->setPayload($data['payload']);
         }
         if (isset($data['latitude'])) {
-            $this->latitude = $data['latitude'];
-            $this->longitude = $data['longitude'];
+            $this->setLatitude($data['latitude']);
+            $this->setLongitude($data['longitude']);
         }
     }
 
@@ -72,7 +73,7 @@ class Attachment extends Model
     }
 
     /**
-     * @param Payload $payload
+     * @param array $payload
      * @return void
      */
     public function setPayload(array $payload): void
@@ -82,7 +83,6 @@ class Attachment extends Model
                 foreach ($payload['buttons'] as $row) 
                 {
                     foreach ($row as $item) {
-//                        \Yii::error($item);
                         switch ($item['type']) {
                             case 'link':
                                 $this->_payload[] = new Link($item);
@@ -102,6 +102,10 @@ class Attachment extends Model
                         }
                     }
                 }
+                break;
+            case self::TYPE_CONTACT:
+                \Yii::error($payload);
+                $this->_payload = new ContactPayload($payload['payload']);
                 break;
         }
 //        foreach ($payload as $item) {
