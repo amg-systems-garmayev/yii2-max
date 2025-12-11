@@ -1,11 +1,8 @@
 <?php
-namespace garmayev\max\types;
+namespace garmayev\max\base;
 
-use garmayev\max\types\Request;
-use garmayev\max\types\Response;
 use garmayev\max\types\Update;
 use GuzzleHttp\Client;
-use yii\base\Component;
 
 /**
  * @property string $access_token
