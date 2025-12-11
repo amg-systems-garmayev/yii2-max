@@ -70,27 +70,16 @@ class Attachment extends Model
         return $this->_filename;
     }
 
-    /**
-     * @param $value
-     * @return void
-     */
     public function setFilename($value)
     {
         $this->_filename = $value;
     }
 
-    /**
-     * @return mixed
-     */
     public function getSize()
     {
         return $this->_size;
     }
 
-    /**
-     * @param $value
-     * @return void
-     */
     public function setSize($value)
     {
         $this->_size = $value;
@@ -104,10 +93,6 @@ class Attachment extends Model
         return $this->_latitude;
     }
 
-    /**
-     * @param $value
-     * @return void
-     */
     public function setLatitude($value)
     {
         $this->_latitude = $value;
@@ -121,10 +106,6 @@ class Attachment extends Model
         return $this->_longitude;
     }
 
-    /**
-     * @param $value
-     * @return void
-     */
     public function setLongitude($value)
     {
         $this->_longitude = $value;
@@ -133,15 +114,11 @@ class Attachment extends Model
     /**
      * @return mixed
      */
-    public function getWIdth()
+    public function getWidth()
     {
         return $this->_width;
     }
 
-    /**
-     * @param $value
-     * @return void
-     */
     public function setWidth($value)
     {
         $this->_width = $value;
@@ -155,10 +132,6 @@ class Attachment extends Model
         return $this->_height;
     }
 
-    /**
-     * @param $value
-     * @return void
-     */
     public function setHeight($value)
     {
         $this->_height = $value;

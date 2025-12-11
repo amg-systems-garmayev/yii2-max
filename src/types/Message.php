@@ -5,15 +5,13 @@ namespace garmayev\max\types;
 use yii\base\Model;
 
 /**
- * @property string $mid
- * @property integer $seq
- * @property string $text
- * @property Attachment[] $attachments
- * @property Markup[] $markup
+ * @property User $sender
  * @property Recipient $recipient
  * @property int $timestamp
+ * @property Link $link
  * @property MessageBody $body
- * @property User $sender
+ * @property Stat $stat
+ * @property string $url
  */
 class Message extends Model
 {
@@ -23,7 +21,7 @@ class Message extends Model
     private Link $_link;
     private MessageBody $_body;
     private Stat $_stat;
-    private $_url;
+    private string $_url;
 
     /**
      * @return User
@@ -77,17 +75,17 @@ class Message extends Model
     }
 
     /**
-     * @return mixed
+     * @return Link
      */
-    public function getLink()
+    public function getLink(): Link
     {
         return $this->_link;
     }
 
     /**
-     * @param mixed $link
+     * @param Link $link
      */
-    public function setLink($link): void
+    public function setLink(Link $link): void
     {
         $this->_link = $link;
     }
@@ -127,17 +125,17 @@ class Message extends Model
     }
 
     /**
-     * @return mixed
+     * @return string
      */
-    public function getUrl()
+    public function getUrl(): string
     {
         return $this->_url;
     }
 
     /**
-     * @param mixed $url
+     * @param string $url
      */
-    public function setUrl($url): void
+    public function setUrl(string $url): void
     {
         $this->_url = $url;
     }
