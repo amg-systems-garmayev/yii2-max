@@ -1,6 +1,6 @@
 <?php
 
-namespace garmayev\max\types;
+namespace garmayev\max\types\payloads;
 
 use yii\base\Model;
 
@@ -18,6 +18,12 @@ class Payload extends Model
     public $_vcf_info;
     private $_max_info;
     private $_code;
+
+    public function init()
+    {
+        parent::init();
+        
+    }
 
     /**
      * @return mixed

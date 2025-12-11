@@ -36,7 +36,7 @@ class Callback extends Model
 
     public function getPayload()
     {
-        return $this->payload;
+        return $this->_payload;
     }
 
     public function setPayload($value)

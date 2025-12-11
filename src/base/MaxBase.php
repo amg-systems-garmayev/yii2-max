@@ -59,7 +59,7 @@ class MaxBase extends \yii\base\Component
                 'body' => json_encode($data)
             ]);
         }
-        \Yii::error(json_decode($result->getBody()->getContents(), true));
+        \Yii::error( json_decode($result->getBody()->getContents(), true));
         return new Response(json_decode($result->getBody()->getContents(), true));
     }
 }

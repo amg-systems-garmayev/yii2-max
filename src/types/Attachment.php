@@ -3,7 +3,13 @@
 namespace garmayev\max\types;
 
 use garmayev\max\types\payloads\ImagePayload;
+use garmayev\max\types\payloads\Payload;
 use yii\base\Model;
+use garmayev\max\types\buttons\Callback;
+use garmayev\max\types\buttons\Link;
+use garmayev\max\types\buttons\RequestContact;
+use garmayev\max\types\buttons\RequestGeoLocation;
+use garmayev\max\types\buttons\Message;
 
 /**
  * @property string $type
@@ -16,6 +22,7 @@ class Attachment extends Model
     const TYPE_IMAGE = "image";
     const TYPE_STICKER = "sticker";
     const TYPE_FILE = "file";
+    const TYPE_INLINE_KEYBOARD = "inline_keyboard";
 
     private string $_type;
     private array $_payload;
@@ -25,6 +32,19 @@ class Attachment extends Model
     private float $_longitude;
     private int $_width;
     private int $_height;
+    public $callback_id;
+
+    public function __construct($data)
+    {
+        $this->type = $data['type'];
+        if (isset($data['payload'])) {
+            $this->payload = $data['payload'];
+        }
+        if (isset($data['latitude'])) {
+            $this->latitude = $data['latitude'];
+            $this->longitude = $data['longitude'];
+        }
+    }
 
     /**
      * @return string
@@ -57,9 +77,36 @@ class Attachment extends Model
      */
     public function setPayload(array $payload): void
     {
-        foreach ($payload as $item) {
-            $this->_payload[] = new Payload($payload);
+        switch ($this->type) {
+            case self::TYPE_INLINE_KEYBOARD:
+                foreach ($payload['buttons'] as $row) 
+                {
+                    foreach ($row as $item) {
+//                        \Yii::error($item);
+                        switch ($item['type']) {
+                            case 'link':
+                                $this->_payload[] = new Link($item);
+                                break;
+                            case 'callback':
+                                $this->_payload[] = new Callback($item);
+                                break;
+                            case 'link':
+                                $this->_payload[] = new RequestContact($item);
+                                break;
+                            case 'link':
+                                $this->_payload[] = new RequestGeoLocation($item);
+                                break;
+                            case 'link':
+                                $this->_payload[] = new Message($item);
+                                break;
+                        }
+                    }
+                }
+                break;
         }
+//        foreach ($payload as $item) {
+//            $this->_payload[] = new Payload($payload);
+//        }
     }
 
     /**
@@ -114,11 +161,7 @@ class Attachment extends Model
     }
 
     /**
-<<<<<<< HEAD
-     * @return mixed
-=======
      * @return float
->>>>>>> d9a7559a24b1f305c6a16a71755b8d1fa886095f
      */
     public function getLongitude()
     {

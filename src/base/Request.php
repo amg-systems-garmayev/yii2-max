@@ -3,6 +3,9 @@
 namespace garmayev\max\base;
 
 use yii\base\Model;
+use garmayev\max\types\Callback;
+use garmayev\max\types\Message;
+use garmayev\max\types\User;
 
 class Request extends Model
 {
@@ -13,9 +16,8 @@ class Request extends Model
     private string $_message_id;
     private $_chat_id;
     private $_user_id;
-    private $_user;
-    private array $_callback_data = [];
-
+    private User $_user;
+    private $_callback;
 
     public function rules()
     {
@@ -23,8 +25,7 @@ class Request extends Model
             [['_timestamp'], 'integer'],
             [['_user_locale', '_update_type'], 'string'],
             [['_message'], 'safe'],
-            [['timestamp', 'message', 'user_locale', 'update_type'], 'safe'],
-            [['_callback_data'], 'safe'],
+            [['timestamp', 'message', 'user_locale', 'update_type', 'callback'], 'safe'],
         ];
     }
 
@@ -108,23 +109,13 @@ class Request extends Model
         $this->_user = new User($value);
     }
 
-    /**
-     * @return array
-     */
-    public function getCallbackData(): array
+    public function getCallback()
     {
-        return $this->_callback_data;
+        return $this->_callback;
     }
 
-    /**
-     * @param array|string $value
-     * @return void
-     */
-    public function setCallbackData($value): void
+    public function setCallback($value)
     {
-        if (is_string($value)) {
-            $value = json_decode($value, true) ?: [];
-        }
-        $this->_callback_data = is_array($value) ? $value : [];
+        $this->_callback = new Callback($value);
     }
 }

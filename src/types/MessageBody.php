@@ -76,6 +76,7 @@ class MessageBody extends \yii\base\Model
     {
         foreach ($value as $item)
         {
+//            \Yii::error($item);
             $this->_attachments[] = new Attachment($item);
         }
     }

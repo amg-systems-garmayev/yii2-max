@@ -9,40 +9,33 @@ use garmayev\max\CallbackManager;
 /**
  * @property string $access_token
  * @property string $secret
- * @property CallbackManager $callbackManager
  */
 class Max extends MaxBase
 {
     public string $access_token;
     public string $secret;
 
-    /**
-     * @var CallbackManager Менеджер обработки callback
-     */
-    private CallbackManager $_callbackManager;
-
-    public function init()
+    public function setWebhook(string $url, arra $types)
     {
-        parent::init();
-        $this->_callbackManager = new CallbackManager();
-    }
-
-    public function setWebhook(string $url)
-    {
-        return $this->send('POST', 'subscriptions', [
+        return parent::send('POST', 'subscriptions', [
             'url' => $url,
-            'update_types' => [
-                Update::TYPE_MESSAGE_CREATED,
-                Update::TYPE_MESSAGE_CALLBACK, // Добавляем обработку callback
-                Update::TYPE_MESSAGE_REMOVED,
-                Update::TYPE_BOT_STARTED
-            ],
-            'secret' => $this->secret
+            'update_types' => $types,
+            'secret' => $this->secret,
         ]);
     }
 
-    public function sendMessage($user_id, $params)
+    public function sendMessage($args, $params)
     {
-        return parent::send('POST', "messages?user_id={$user_id}", $params);
+        return parent::send('POST', "messages", $params, $args);
+    }
+
+    public function editMessage($args, $params)
+    {
+        return parent::send();
+    }
+
+    public function answers($args, $params)
+    {
+        return parent::send('POST', 'answers', $params, $args);
     }
 }

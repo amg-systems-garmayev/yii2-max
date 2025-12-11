@@ -32,12 +32,12 @@ class Message extends Model
     }
 
     /**
-     * @param User $sender
+     * @param array $sender
      * @return void
      */
-    public function setSender(User $sender): void
+    public function setSender(array $sender): void
     {
-        $this->_sender = $sender;
+        $this->_sender = new User($sender);
     }
 
     /**
@@ -49,12 +49,12 @@ class Message extends Model
     }
 
     /**
-     * @param Recipient $recipient
+     * @param array $recipient
      * @return void
      */
-    public function setRecipient(Recipient $recipient): void
+    public function setRecipient(array $recipient): void
     {
-        $this->_recipient = $recipient;
+        $this->_recipient = new Recipient($recipient);
     }
 
     /**
@@ -83,12 +83,12 @@ class Message extends Model
     }
 
     /**
-     * @param Link $link
+     * @param array $link
      * @return void
      */
-    public function setLink(Link $link): void
+    public function setLink(array $link): void
     {
-        $this->_link = $link;
+        $this->_link = new Link($link);
     }
 
     /**
@@ -100,12 +100,12 @@ class Message extends Model
     }
 
     /**
-     * @param MessageBody $body
+     * @param array $body
      * @return void
      */
-    public function setBody(MessageBody $body): void
+    public function setBody(array $body): void
     {
-        $this->_body = $body;
+        $this->_body = new MessageBody($body);
     }
 
     /**
@@ -120,9 +120,9 @@ class Message extends Model
      * @param Stat $stat
      * @return void
      */
-    public function setStat(Stat $stat): void
+    public function setStat(array $stat): void
     {
-        $this->_stat = $stat;
+        $this->_stat = new Stat($stat);
     }
 
     /**
