@@ -64,18 +64,5 @@ class MaxBase extends \yii\base\Component
         }
         \Yii::error(json_decode($result->getBody()->getContents(), true));
         return new Response(json_decode($result->getBody()->getContents(), true));
-=======
-    public function send($method, $action, $data)
-    {
-        $data = $this->client->request($method, $this->base.$action, [
-            'headers' => [
-                'Content-Type' => 'application/json',
-                'Authorization' => $this->access_token,
-            ],
-            'body' => json_encode($data)
-        ]);
-        \Yii::error(json_decode($data->getBody()->getContents(), true));
-        return new Response(json_decode($data->getBody()->getContents(), true));
->>>>>>> parent of d9a7559 (Callback_data)
     }
 }
