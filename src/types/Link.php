@@ -12,10 +12,13 @@ use yii\base\Model;
  */
 class Link extends Model
 {
+    const TYPE_FORWARD = 'forward';
+    const TYPE_REPLY = 'reply';
+
     public string $_type;
     public User $_sender;
     public int $_chat_id;
-    public Message $_message;
+    public MessageBody $_message;
 
     /**
      * @return string

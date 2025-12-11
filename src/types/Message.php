@@ -17,141 +17,128 @@ use yii\base\Model;
  */
 class Message extends Model
 {
-    private string $_mid;
-    private int $_seq;
-    private string $_text;
-    private array $_attachments;
-    private array $_markup;
+    private User $_sender;
     private Recipient $_recipient;
     private int $_timestamp;
+    private Link $_link;
     private MessageBody $_body;
-    private User $_sender;
+    private Stat $_stat;
+    private $_url;
 
     /**
-     * @return string
+     * @return User
      */
-    public function getMid(): string
+    public function getSender(): User
     {
-        return $this->_mid;
+        return $this->_sender;
     }
 
     /**
-     * @param string $mid
+     * @param User $sender
      * @return void
      */
-    public function setMid(string $mid): void
+    public function setSender(User $sender): void
     {
-        $this->_mid = $mid;
+        $this->_sender = $sender;
+    }
+
+    /**
+     * @return Recipient
+     */
+    public function getRecipient(): Recipient
+    {
+        return $this->_recipient;
+    }
+
+    /**
+     * @param Recipient $recipient
+     * @return void
+     */
+    public function setRecipient(Recipient $recipient): void
+    {
+        $this->_recipient = $recipient;
     }
 
     /**
      * @return int
      */
-    public function getSeq(): int
-    {
-        return $this->_seq;
-    }
-
-    /**
-     * @param int $seq
-     * @return void
-     */
-    public function setSeq(int $seq): void
-    {
-        $this->_seq = $seq;
-    }
-
-    /**
-     * @return string
-     */
-    public function getText(): string
-    {
-        return $this->_text;
-    }
-
-    /**
-     * @param string $text
-     * @return void
-     */
-    public function setText(string $text): void
-    {
-        $this->_text = $text;
-    }
-
-    /**
-     * @return array
-     */
-    public function getAttachments(): array
-    {
-        return $this->_attachments;
-    }
-
-    /**
-     * @param array $attachments
-     * @return void
-     */
-    public function setAttachments(array $attachments): void
-    {
-        foreach ($attachments as $attachment) {
-            $this->_attachments[] = new Attachment($attachments);
-        }
-    }
-
-    /**
-     * @return array
-     */
-    public function getMarkup(): array
-    {
-        return $this->_markup;
-    }
-
-    /**
-     * @param array $markup
-     * @return void
-     */
-    public function setMarkup(array $markup): void
-    {
-        foreach ($markup as $k => $v) {
-            $this->_markup[] = new Markup($markup);
-        }
-    }
-  
-    public function getRecipient() {
-        return $this->_recipient;
-    }
-  
-    public function setRecipient($value):void
-    {
-        $this->_recipient = new Recipient($value);
-    }
-
-    public function getTimestamp()
+    public function getTimestamp(): int
     {
         return $this->_timestamp;
     }
 
-    public function setTimestamp(int $value): void
+    /**
+     * @param int $timestamp
+     * @return void
+     */
+    public function setTimestamp(int $timestamp): void
     {
-        $this->_timestamp = $value;
+        $this->_timestamp = $timestamp;
     }
 
-    public function getBody()
+    /**
+     * @return mixed
+     */
+    public function getLink()
+    {
+        return $this->_link;
+    }
+
+    /**
+     * @param mixed $link
+     */
+    public function setLink($link): void
+    {
+        $this->_link = $link;
+    }
+
+    /**
+     * @return MessageBody
+     */
+    public function getBody(): MessageBody
     {
         return $this->_body;
     }
 
-    public function setBody($value): void
+    /**
+     * @param MessageBody $body
+     * @return void
+     */
+    public function setBody(MessageBody $body): void
     {
-        $this->_body = new MessageBody($value);
+        $this->_body = $body;
     }
 
-    public function getSender()
+    /**
+     * @return Stat
+     */
+    public function getStat(): Stat
     {
-        return $this->_sender;
+        return $this->_stat;
     }
 
-    public function setSender($value)
+    /**
+     * @param Stat $stat
+     * @return void
+     */
+    public function setStat(Stat $stat): void
     {
-        $this->_sender = new User($value);
+        $this->_stat = $stat;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getUrl()
+    {
+        return $this->_url;
+    }
+
+    /**
+     * @param mixed $url
+     */
+    public function setUrl($url): void
+    {
+        $this->_url = $url;
     }
 }

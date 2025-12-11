@@ -2,6 +2,7 @@
 
 namespace garmayev\max\types;
 
+use garmayev\max\types\payloads\ImagePayload;
 use yii\base\Model;
 
 /**
@@ -61,61 +62,103 @@ class Attachment extends Model
         }
     }
 
+    /**
+     * @return mixed
+     */
     public function getFilename()
     {
         return $this->_filename;
     }
 
+    /**
+     * @param $value
+     * @return void
+     */
     public function setFilename($value)
     {
         $this->_filename = $value;
     }
 
+    /**
+     * @return mixed
+     */
     public function getSize()
     {
         return $this->_size;
     }
 
+    /**
+     * @param $value
+     * @return void
+     */
     public function setSize($value)
     {
         $this->_size = $value;
     }
 
+    /**
+     * @return mixed
+     */
     public function getLatitude()
     {
         return $this->_latitude;
     }
 
+    /**
+     * @param $value
+     * @return void
+     */
     public function setLatitude($value)
     {
         $this->_latitude = $value;
     }
 
+    /**
+     * @return mixed
+     */
     public function getLongitude()
     {
         return $this->_longitude;
     }
 
+    /**
+     * @param $value
+     * @return void
+     */
     public function setLongitude($value)
     {
         $this->_longitude = $value;
     }
 
+    /**
+     * @return mixed
+     */
     public function getWIdth()
     {
         return $this->_width;
     }
 
+    /**
+     * @param $value
+     * @return void
+     */
     public function setWidth($value)
     {
         $this->_width = $value;
     }
 
+    /**
+     * @return mixed
+     */
     public function getHeight()
     {
         return $this->_height;
     }
 
+    /**
+     * @param $value
+     * @return void
+     */
     public function setHeight($value)
     {
         $this->_height = $value;
