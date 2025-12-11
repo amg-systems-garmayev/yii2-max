@@ -28,41 +28,69 @@ class Update extends Model
     private Message $_message;
     private string $_user_locale;
 
+    /**
+     * @return string
+     */
     public function getUpdate_type()
     {
         return $this->_update_type;
     }
 
+    /**
+     * @param string $value
+     * @return void
+     */
     public function setUpdate_type(string $value)
     {
         $this->_update_type = $value;
     }
 
+    /**
+     * @return int
+     */
     public function getTimestamp()
     {
         return $this->_timestamp;
     }
 
+    /**
+     * @param int $value
+     * @return void
+     */
     public function setTimestamp(int $value)
     {
         $this->_timestamp = $value;
     }
 
+    /**
+     * @return Message
+     */
     public function getMessage()
     {
         return $this->_message;
     }
 
+    /**
+     * @param array $value
+     * @return void
+     */
     public function setMessage(array $value)
     {
         $this->_message = new Message($value);
     }
 
+    /**
+     * @return string
+     */
     public function getUser_locale()
     {
         return $this->_user_locale;
     }
 
+    /**
+     * @param string $value
+     * @return void
+     */
     public function setUser_locale(string $value)
     {
         $this->_user_locale = $value;

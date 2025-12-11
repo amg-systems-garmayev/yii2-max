@@ -19,12 +19,12 @@ class Attachment extends Model
 
     private string $_type;
     private array $_payload;
-    private $_filename;
-    private $_size;
-    private $_latitude;
-    private $_longitude;
-    private $_width;
-    private $_height;
+    private string $_filename;
+    private int $_size;
+    private float $_latitude;
+    private float $_longitude;
+    private int $_width;
+    private int $_height;
 
     /**
      * @return string
@@ -63,75 +63,106 @@ class Attachment extends Model
     }
 
     /**
-     * @return mixed
+     * @return string
      */
     public function getFilename()
     {
         return $this->_filename;
     }
 
+    /**
+     * @param $value
+     * @return void
+     */
     public function setFilename($value)
     {
         $this->_filename = $value;
     }
 
+    /**
+     * @return int
+     */
     public function getSize()
     {
         return $this->_size;
     }
 
+    /**
+     * @param $value
+     * @return void
+     */
     public function setSize($value)
     {
         $this->_size = $value;
     }
 
     /**
-     * @return mixed
+     * @return float
      */
     public function getLatitude()
     {
         return $this->_latitude;
     }
 
+    /**
+     * @param $value
+     * @return void
+     */
     public function setLatitude($value)
     {
         $this->_latitude = $value;
     }
 
     /**
+<<<<<<< HEAD
      * @return mixed
+=======
+     * @return float
+>>>>>>> d9a7559a24b1f305c6a16a71755b8d1fa886095f
      */
     public function getLongitude()
     {
         return $this->_longitude;
     }
 
+    /**
+     * @param $value
+     * @return void
+     */
     public function setLongitude($value)
     {
         $this->_longitude = $value;
     }
 
     /**
-     * @return mixed
+     * @return int
      */
     public function getWidth()
     {
         return $this->_width;
     }
 
+    /**
+     * @param $value
+     * @return void
+     */
     public function setWidth($value)
     {
         $this->_width = $value;
     }
 
     /**
-     * @return mixed
+     * @return int
      */
     public function getHeight()
     {
         return $this->_height;
     }
 
+    /**
+     * @param $value
+     * @return void
+     */
     public function setHeight($value)
     {
         $this->_height = $value;

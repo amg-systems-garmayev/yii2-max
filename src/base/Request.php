@@ -14,6 +14,8 @@ class Request extends Model
     private $_chat_id;
     private $_user_id;
     private $_user;
+    private array $_callback_data = [];
+
 
     public function rules()
     {
@@ -22,6 +24,7 @@ class Request extends Model
             [['_user_locale', '_update_type'], 'string'],
             [['_message'], 'safe'],
             [['timestamp', 'message', 'user_locale', 'update_type'], 'safe'],
+            [['_callback_data'], 'safe'],
         ];
     }
 
@@ -103,5 +106,25 @@ class Request extends Model
     public function setUser($value)
     {
         $this->_user = new User($value);
+    }
+
+    /**
+     * @return array
+     */
+    public function getCallbackData(): array
+    {
+        return $this->_callback_data;
+    }
+
+    /**
+     * @param array|string $value
+     * @return void
+     */
+    public function setCallbackData($value): void
+    {
+        if (is_string($value)) {
+            $value = json_decode($value, true) ?: [];
+        }
+        $this->_callback_data = is_array($value) ? $value : [];
     }
 }

@@ -84,6 +84,7 @@ class Message extends Model
 
     /**
      * @param Link $link
+     * @return void
      */
     public function setLink(Link $link): void
     {
@@ -134,47 +135,10 @@ class Message extends Model
 
     /**
      * @param string $url
+     * @return void
      */
     public function setUrl(string $url): void
     {
         $this->_url = $url;
-    }
-
-    /**
-     * @return array
-     */
-    public function getAttachments(): array
-    {
-        return $this->_attachments;
-    }
-
-    /**
-     * @param array $attachments
-     * @return void
-     */
-    public function setAttachments(array $attachments): void
-    {
-        foreach ($attachments as $attachment) {
-            $this->_attachments[] = new Attachment($attachments);
-        }
-    }
-
-    /**
-     * @return array
-     */
-    public function getMarkup(): array
-    {
-        return $this->_markup;
-    }
-
-    /**
-     * @param array $markup
-     * @return void
-     */
-    public function setMarkup(array $markup): void
-    {
-        foreach ($markup as $k => $v) {
-            $this->_markup[] = new Markup($markup);
-        }
     }
 }
