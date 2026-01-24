@@ -1,31 +1,20 @@
-MAX
-===
-Модуль для работы с MAX
+# Установка
 
-Installation
-------------
+Установка расширения осуществляется через Composer.
 
-The preferred way to install this extension is through [composer](https://getcomposer.org/download/).
-
-Either run
-
+### Через командную строку:
 ```
 php composer.phar require --prefer-dist garmayev/yii2-max "*"
 ```
 
-or add
+Или добавьте в `composer.json`:
 
 ```
 "garmayev/yii2-max": "*"
 ```
 
-to the require section of your `composer.json` file.
-
-
-Usage
------
-
-Once the extension is installed, simply use it in your code by  :
-
-```php
-<?= \garmayev\max\AutoloadExample::widget(); ?>```
+## Использование
+### Подключение расширения
+После установки расширение автоматически подключается через механизм Bootstrap.
+### Инициализация
+Для работы с MAX API необходимо инициализировать класс Max с параметрами доступа:

@@ -23,17 +23,17 @@ class Max extends MaxBase
         ]);
     }
 
-    public function sendMessage(array $args, array $params)
+    public function sendMessage(array $params, array $args)
     {
         return parent::send('POST', "messages", $params, $args);
     }
 
-    public function editMessage(array $args, array $params)
+    public function editMessage(array $params, array $args)
     {
         return parent::send('PUT', 'messages', $params, $args);
     }
 
-    public function answers(array $args, array $params)
+    public function answers(array $params, array $args)
     {
         return parent::send('POST', 'answers', $params, $args);
     }
