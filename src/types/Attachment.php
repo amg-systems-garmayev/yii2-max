@@ -2,6 +2,7 @@
 
 namespace garmayev\max\types;
 
+use garmayev\max\types\buttons\Button;
 use garmayev\max\types\payloads\ImagePayload;
 use garmayev\max\types\payloads\Payload;
 use yii\base\Model;
@@ -84,33 +85,31 @@ class Attachment extends Model
                 {
                     foreach ($row as $item) {
                         switch ($item['type']) {
-                            case 'link':
-                                $this->_payload[] = new Link($item);
+                            case Button::TYPE_LINK:
+                                $this->_payload['buttons'][] = new Link($item);
                                 break;
-                            case 'callback':
-                                $this->_payload[] = new Callback($item);
+                            case Button::TYPE_CALLBACK:
+                                $this->_payload['buttons'][] = new Callback($item);
                                 break;
-                            case 'link':
-                                $this->_payload[] = new RequestContact($item);
+                            case Button::TYPE_REQUEST_CONTACT:
+                                $this->_payload['buttons'][] = new RequestContact($item);
                                 break;
-                            case 'link':
-                                $this->_payload[] = new RequestGeoLocation($item);
+                            case Button::TYPE_REQUEST_GEO_LOCATION:
+                                $this->_payload['buttons'][] = new RequestGeoLocation($item);
                                 break;
-                            case 'link':
-                                $this->_payload[] = new Message($item);
+                            case Button::TYPE_MESSAGE:
+                                $this->_payload['buttons'][] = new Message($item);
                                 break;
                         }
                     }
                 }
                 break;
             case self::TYPE_CONTACT:
-                \Yii::error($payload);
-                $this->_payload = new ContactPayload($payload['payload']);
+                $this->_payload[] = new ContactPayload($payload['payload']);
                 break;
+//            case self::TYPE_LOCATION:
+//                $this->_payload[] = new LocationPayload();
         }
-//        foreach ($payload as $item) {
-//            $this->_payload[] = new Payload($payload);
-//        }
     }
 
     /**
