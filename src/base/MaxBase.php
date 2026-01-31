@@ -1,8 +1,10 @@
 <?php
+
 namespace garmayev\max\base;
 
 use garmayev\max\types\Update;
 use GuzzleHttp\Client;
+use GuzzleHttp\Exception\GuzzleException;
 
 /**
  * @property string $access_token
@@ -33,33 +35,65 @@ class MaxBase extends \yii\base\Component
     }
 
     /**
-     * @param string $method
-     * @param string $action
-     * @param array $data
-     * @param array|null $args
+     * Отправка запроса к API MAX
+     *
+     * @param string $method HTTP метод (GET, POST, PUT, DELETE)
+     * @param string $action API endpoint (messages, answers и т.д.)
+     * @param array $data Тело запроса
+     * @param array|null $args Query параметры (user_id, message_id, callback_id и т.д.)
      * @return \garmayev\max\types\Response
-     * @throws \GuzzleHttp\Exception\GuzzleException
+     * @throws GuzzleException
      */
-    public function send(string $method, string $action, array $data, ?array $args = null)
+    public function send(string $method, string $action, array $data = [], ?array $args = null)
     {
-        if ($args && is_array($args)) {
-            $result = $this->client->request($method, $this->base . $action . '?' . http_build_query($args), [
-                'headers' => [
-                    'Content-Type' => 'application/json',
-                    'Authorization' => $this->access_token,
-                ],
-                'body' => json_encode($data)
-            ]);
-        } else {
-            $result = $this->client->request($method, $this->base . $action, [
-                'headers' => [
-                    'Content-Type' => 'application/json',
-                    'Authorization' => $this->access_token,
-                ],
-                'body' => json_encode($data)
-            ]);
+        $url = $this->base . $action;
+
+        // Добавляем query параметры если они есть
+        if ($args && is_array($args) && !empty($args)) {
+            $url .= '?' . http_build_query($args);
         }
-        \Yii::error( json_decode($result->getBody()->getContents(), true));
-        return new Response(json_decode($result->getBody()->getContents(), true));
+
+        $options = [
+            'headers' => [
+                'Content-Type' => 'application/json',
+                'Authorization' => $this->access_token,
+            ],
+        ];
+
+        // Для GET запросов данные передаем как query параметры
+        if (strtoupper($method) === 'GET' && !empty($data)) {
+            if (isset($options['query'])) {
+                $options['query'] = array_merge($options['query'], $data);
+            } else {
+                $options['query'] = $data;
+            }
+        }
+        // Для DELETE запросов не отправляем тело, если нет специальных данных
+        else if (strtoupper($method) === 'DELETE' && empty($data)) {
+            // Не добавляем body для простых DELETE запросов
+        }
+        // Для POST, PUT и DELETE с данными добавляем тело запроса
+        else if (!empty($data)) {
+            $options['json'] = $data;
+        }
+
+        try {
+            $response = $this->client->request($method, $url, $options);
+            $responseBody = $response->getBody()->getContents();
+
+            // Логируем ответ
+            \Yii::error(['response' => json_decode($responseBody, true)]);
+
+            return new \garmayev\max\types\Response(json_decode($responseBody, true));
+
+        } catch (GuzzleException $e) {
+            \Yii::error([
+                'error' => $e->getMessage(),
+                'url' => $url,
+                'method' => $method,
+                'options' => $options
+            ]);
+            throw $e;
+        }
     }
 }
