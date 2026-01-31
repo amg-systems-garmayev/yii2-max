@@ -7,6 +7,7 @@ use garmayev\max\types\Update;
 use garmayev\max\types\Callback;
 use garmayev\max\types\Message;
 use garmayev\max\types\Chat;
+use garmayev\max\types\User;
 use garmayev\max\base\MaxBase;
 
 /**
@@ -348,7 +349,7 @@ class EventHandler
      */
     public function getMessage(): ?Message
     {
-        if ($this->request && $this->request->getMessage()) {
+        if ($this->request) {
             return $this->request->getMessage();
         }
 
@@ -362,7 +363,7 @@ class EventHandler
      */
     public function getCallback(): ?Callback
     {
-        if ($this->request && $this->request->getCallback()) {
+        if ($this->request) {
             return $this->request->getCallback();
         }
 
@@ -376,8 +377,14 @@ class EventHandler
      */
     public function getChat(): ?Chat
     {
-        if ($this->request && $this->request->getMessage()) {
-            return $this->request->getMessage()->recipient;
+        $message = $this->getMessage();
+        if ($message !== null && $message->getRecipient() !== null) {
+            // Создаем простой объект Chat из recipient
+            $recipient = $message->getRecipient();
+            $chat = new Chat();
+            $chat->setChat_id($recipient->getChat_id());
+            $chat->setType($recipient->getChat_type());
+            return $chat;
         }
 
         return null;
@@ -390,16 +397,38 @@ class EventHandler
      */
     public function getUser(): ?User
     {
-        if ($this->request && $this->request->getUser()) {
-            return $this->request->getUser();
-        }
+        // Пробуем получить пользователя из разных источников
+        if ($this->request) {
+            // Сначала из свойства user
+            if ($this->request->getUser() !== null) {
+                return $this->request->getUser();
+            }
 
-        if ($this->request && $this->request->getMessage()) {
-            return $this->request->getMessage()->sender;
-        }
+            // Затем из сообщения
+            if ($this->request->getMessage() !== null) {
+                $message = $this->request->getMessage();
+                if ($message->getSender() !== null) {
+                    return $message->getSender();
+                }
+            }
 
-        if ($this->request && $this->request->getCallback()) {
-            return $this->request->getCallback()->user;
+            // Затем из callback
+            if ($this->request->getCallback() !== null) {
+                $callback = $this->request->getCallback();
+                if ($callback->getUser() !== null) {
+                    return $callback->getUser();
+                }
+            }
+
+            // Пробуем создать пользователя из user_id
+            if ($this->request->getUser_id() !== null) {
+                return new User([
+                    'user_id' => $this->request->getUser_id(),
+                    'first_name' => 'Пользователь',
+                    'last_name' => '',
+                    'name' => 'Пользователь'
+                ]);
+            }
         }
 
         return null;

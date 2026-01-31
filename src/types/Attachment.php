@@ -105,7 +105,7 @@ class Attachment extends Model
                 }
                 break;
             case self::TYPE_CONTACT:
-                $this->_payload[] = new ContactPayload($payload['payload']);
+                $this->_payload[] = new ContactPayload($payload['max_info']);
                 break;
 //            case self::TYPE_LOCATION:
 //                $this->_payload[] = new LocationPayload();
