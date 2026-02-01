@@ -15,7 +15,7 @@ use garmayev\max\types\payloads\ContactPayload;
 
 /**
  * @property string $type
- * @property Payload $payload
+ * @property Payload|array|null $payload
  */
 class Attachment extends Model
 {
@@ -66,9 +66,9 @@ class Attachment extends Model
     }
 
     /**
-     * @return array
+     * @return Payload|array|null
      */
-    public function getPayload(): array
+    public function getPayload()
     {
         return $this->_payload;
     }
@@ -81,7 +81,8 @@ class Attachment extends Model
     {
         switch ($this->type) {
             case self::TYPE_INLINE_KEYBOARD:
-                foreach ($payload['buttons'] as $row) 
+                $this->_payload = ['buttons' => []];
+                foreach ($payload['buttons'] as $row)
                 {
                     foreach ($row as $item) {
                         switch ($item['type']) {
@@ -105,10 +106,17 @@ class Attachment extends Model
                 }
                 break;
             case self::TYPE_CONTACT:
-                $this->_payload[] = new ContactPayload($payload);
+                // Исправляем создание ContactPayload
+                $this->_payload = new ContactPayload($payload);
                 break;
-//            case self::TYPE_LOCATION:
-//                $this->_payload[] = new LocationPayload();
+            case self::TYPE_IMAGE:
+                $this->_payload = new ImagePayload($payload);
+                break;
+            // case self::TYPE_LOCATION:
+            //     $this->_payload = new LocationPayload($payload);
+            //     break;
+            default:
+                $this->_payload = $payload;
         }
     }
 
