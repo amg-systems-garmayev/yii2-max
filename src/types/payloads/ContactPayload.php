@@ -2,7 +2,7 @@
 
 namespace garmayev\max\types\payloads;
 
-use app\components\VCardParser;
+use garmayev\max\base\VCardParser;
 
 /**
  * @property string|null $name
