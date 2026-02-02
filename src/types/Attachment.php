@@ -4,6 +4,7 @@ namespace garmayev\max\types;
 
 use garmayev\max\types\buttons\Button;
 use garmayev\max\types\payloads\ImagePayload;
+use garmayev\max\types\payloads\LocationPayload;
 use garmayev\max\types\payloads\Payload;
 use yii\base\Model;
 use garmayev\max\types\buttons\Callback;
@@ -27,7 +28,7 @@ class Attachment extends Model
     const TYPE_INLINE_KEYBOARD = "inline_keyboard";
 
     private string $_type;
-    private array $_payload;
+    private $_payload;
     private string $_filename;
     private int $_size;
     private float $_latitude;
@@ -35,18 +36,6 @@ class Attachment extends Model
     private int $_width;
     private int $_height;
     public $callback_id;
-
-    public function __construct($data)
-    {
-        $this->type = $data['type'];
-        if (isset($data['payload'])) {
-            $this->setPayload($data['payload']);
-        }
-        if (isset($data['latitude'])) {
-            $this->setLatitude($data['latitude']);
-            $this->setLongitude($data['longitude']);
-        }
-    }
 
     /**
      * @return string
@@ -112,9 +101,9 @@ class Attachment extends Model
             case self::TYPE_IMAGE:
                 $this->_payload = new ImagePayload($payload);
                 break;
-            // case self::TYPE_LOCATION:
-            //     $this->_payload = new LocationPayload($payload);
-            //     break;
+             case self::TYPE_LOCATION:
+                 $this->_payload = new LocationPayload($payload);
+                 break;
             default:
                 $this->_payload = $payload;
         }
