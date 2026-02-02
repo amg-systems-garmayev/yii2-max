@@ -37,6 +37,13 @@ class Attachment extends Model
     private int $_height;
     public $callback_id;
 
+    public function __construct($config = [])
+    {
+        parent::__construct($config);
+        $this->type = $config['type'];
+        $this->payload = $config['payload'];
+    }
+
     /**
      * @return string
      */
