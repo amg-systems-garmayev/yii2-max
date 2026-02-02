@@ -25,7 +25,7 @@ class Request extends Model
             [['_timestamp'], 'integer'],
             [['_user_locale', '_update_type', '_message_id'], 'string'],
             [['_message', '_callback', '_user', '_chat_id'], 'safe'],
-            [['timestamp', 'message', 'user_locale', 'update_type', 'callback'], 'safe'],
+            [['timestamp', 'message', 'user_locale', 'update_type', 'user', 'callback'], 'safe'],
         ];
     }
 

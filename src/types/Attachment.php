@@ -68,7 +68,7 @@ class Attachment extends Model
      */
     public function setPayload(array $payload): void
     {
-        switch ($this->type) {
+        switch ($this->_type) {
             case self::TYPE_INLINE_KEYBOARD:
                 $this->_payload = ['buttons' => []];
                 foreach ($payload['buttons'] as $row)
