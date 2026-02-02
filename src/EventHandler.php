@@ -227,9 +227,9 @@ class EventHandler
      */
     public function callback(string $payload, callable $handler): self
     {
-        $this->on(Update::TYPE_MESSAGE_CALLBACK, function (Callback $callback) use ($payload, $handler) {
-            if ($callback->getPayload() === $payload) {
-                $handler($callback);
+        $this->on(Update::TYPE_MESSAGE_CALLBACK, function (Request $request) use ($payload, $handler) {
+            if ($request->callback->getPayload() === $payload) {
+                $handler($request->callback);
                 return true; // Останавливаем дальнейшую обработку
             }
 

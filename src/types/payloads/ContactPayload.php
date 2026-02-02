@@ -15,9 +15,19 @@ class ContactPayload extends Payload
 {
     private ?string $_name;
     private ?int $_contact_id;
-    public string $_vcf_info;
+    public array $_vcf_info;
     public ?string $_vcf_phone;
     public array $_max_info;
+
+    public function __construct($config = [])
+    {
+        $this->setName($config['name'] ?? null);
+        $this->setContact_id($config['contact_id'] ?? null);
+        $this->setVcf_info($config['vcf_info'] ?? null);
+        $this->setVcf_phone($config['vcf_phone'] ?? null);
+        $this->setMax_info($config['max_info'] ?? null);
+        parent::__construct($config);
+    }
 
     /**
      * @return string|null
@@ -58,11 +68,7 @@ class ContactPayload extends Payload
      */
     public function getVcf_info(): ?array
     {
-        $parser = new VCardParser();
-        if ($parser->parse($this->_vcf_info)) {
-            return $parser->getData();
-        }
-        return null;
+        return $this->_vcf_info;
     }
 
     /**
@@ -79,7 +85,7 @@ class ContactPayload extends Payload
      */
     public function getVcf_phone(): ?string
     {
-        return $this->_vcf_phone;
+        return $this->_vcf_phone ?? "";
     }
 
     /**
@@ -91,9 +97,9 @@ class ContactPayload extends Payload
         $this->_vcf_phone = $vcf_phone;
     }
 
-    public function getMax_info()
+    public function getMax_info(): ?array
     {
-        return $this->_max_info;
+        return $this->_max_info ?? [];
     }
 
     public function setMax_info($max_info)
