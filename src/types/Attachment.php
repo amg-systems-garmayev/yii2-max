@@ -39,9 +39,9 @@ class Attachment extends Model
 
     public function __construct($config = [])
     {
+        $this->setType($config['type']);
+        $this->setPayload($config['payload']);
         parent::__construct($config);
-        $this->type = $config['type'];
-        $this->payload = $config['payload'];
     }
 
     /**
