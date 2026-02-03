@@ -9,14 +9,17 @@ use yii\base\Model;
  */
 class Response extends Model
 {
-    public bool $success;
-    public ?array $data;
-    public ?string $error;
-    public ?array $message;
-    public ?int $chat_id;
-    public ?string $chat_type;
-    public ?string $status;
-
+    private bool $_success;
+    private ?array $_data;
+    private ?string $_error;
+    private Message|string $_message = "";
+    private ?int $_chat_id;
+    private ?string $_chat_type;
+    private ?string $_status;
+    private ?array $_subscriptions;
+    private ?array $_recipient;
+    private ?array $_body;
+    
     /**
      * Конструктор
      *
@@ -26,13 +29,16 @@ class Response extends Model
     {
         parent::__construct();
 
-        $this->success = $data['success'] ?? false;
-        $this->data = $data['data'] ?? null;
-        $this->error = $data['error'] ?? null;
-        $this->message = $data['message'] ?? null;
-        $this->chat_id = $data['chat_id'] ?? null;
-        $this->chat_type = $data['chat_type'] ?? null;
-        $this->status = $data['status'] ?? null;
+        $this->_success = $data['success'] ?? false;
+        $this->_data = $data['data'] ?? null;
+        $this->_error = $data['error'] ?? null;
+        $this->_message = $data['message'] ?? null;
+        $this->_chat_id = $data['chat_id'] ?? null;
+        $this->_chat_type = $data['chat_type'] ?? null;
+        $this->_status = $data['status'] ?? null;
+        $this->_subscriptions = $data['subscriptions'] ?? [];
+        $this->_recipient = $data['recipient'] ?? [];
+        $this->_body = $data['body'] ?? [];
     }
 
     /**
@@ -42,7 +48,7 @@ class Response extends Model
      */
     public function isSuccess(): bool
     {
-        return $this->success === true;
+        return $this->_success === true;
     }
 
     /**
@@ -52,7 +58,7 @@ class Response extends Model
      */
     public function getMessageId(): ?string
     {
-        return $this->message['mid'] ?? $this->data['mid'] ?? null;
+        return $this->_message['mid'] ?? $this->_data['mid'] ?? null;
     }
 
     /**
@@ -62,7 +68,7 @@ class Response extends Model
      */
     public function getMessageText(): ?string
     {
-        return $this->message['text'] ?? $this->data['text'] ?? null;
+        return $this->_message['text'] ?? $this->_data['text'] ?? null;
     }
 
     /**
@@ -72,6 +78,90 @@ class Response extends Model
      */
     public function getError(): ?string
     {
-        return $this->error;
+        return $this->_error;
+    }
+
+    public function getData(): ?array
+    {
+        return $this->_data;
+    }
+
+    public function setData(?array $data): void
+    {
+        $this->_data = $data;
+    }
+
+    public function getMessage(): ?array
+    {
+        return $this->_message;
+    }
+
+    public function setMessage(array|string $message): void
+    {
+        if (is_string($message)) {
+            $this->_message = $message;
+        } else {
+            $this->_message = new Message($message);
+        }
+    }
+
+    public function getChatId(): ?int
+    {
+        return $this->_chat_id;
+    }
+
+    public function setChatId(?int $chat_id): void
+    {
+        $this->_chat_id = $chat_id;
+    }
+
+    public function getChatType(): ?string
+    {
+        return $this->_chat_type;
+    }
+
+    public function setChatType(?string $chat_type): void
+    {
+        $this->_chat_type = $chat_type;
+    }
+
+    public function getStatus(): ?string
+    {
+        return $this->_status;
+    }
+
+    public function setStatus(?string $status): void
+    {
+        $this->_status = $status;
+    }
+
+    public function getSubscriptions(): ?array
+    {
+        return $this->_subscriptions;
+    }
+
+    public function setSubscriptions(?array $subscriptions): void
+    {
+        $this->_subscriptions = $subscriptions;
+    }
+
+    public function getRecipient(): ?array
+    {
+        return $this->_recipient;
+    }
+
+    public function setRecipient(?array $recipient): void
+    {
+        $this->_recipient = $recipient;
+    }
+
+    public function getBody(): ?array
+    {
+        return $this->_body;
+    }
+
+    public function setBody(?array $body): void
+    {
+        $this->_body = $body;
     }
 }

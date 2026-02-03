@@ -29,7 +29,7 @@ class MaxBase extends \yii\base\Component
         $this->client = new Client();
         $data = json_decode(file_get_contents("php://input"), true);
         if ($data) {
-            \Yii::error($data);
+//            \Yii::error($data);
             $this->request = new Request($data);
         }
     }
@@ -82,7 +82,7 @@ class MaxBase extends \yii\base\Component
             $responseBody = $response->getBody()->getContents();
 
             // Логируем ответ
-            \Yii::error(['response' => json_decode($responseBody, true)]);
+//            \Yii::error(['response' => json_decode($responseBody, true)]);
 
             return new \garmayev\max\types\Response(json_decode($responseBody, true));
 

@@ -55,42 +55,6 @@ class MessageBuilder
     }
 
     /**
-     * Устанавливает chat_id
-     *
-     * @param int $chatId ID чата
-     * @return $this
-     */
-    public function chatId(int $chatId): self
-    {
-        $this->message['chat_id'] = $chatId;
-        return $this;
-    }
-
-    /**
-     * Устанавливает chat_type
-     *
-     * @param string $chatType Тип чата
-     * @return $this
-     */
-    public function chatType(string $chatType): self
-    {
-        $this->message['chat_type'] = $chatType;
-        return $this;
-    }
-
-    /**
-     * Устанавливает user_id
-     *
-     * @param int $userId ID пользователя
-     * @return $this
-     */
-    public function userId(int $userId): self
-    {
-        $this->message['user_id'] = $userId;
-        return $this;
-    }
-
-    /**
      * Добавляет встроенную клавиатуру
      *
      * @param array $buttons Массив кнопок
@@ -279,15 +243,13 @@ class MessageBuilder
      * @param int $size Размер файла
      * @return $this
      */
-    public function file(string $token, string $filename, int $size): self
+    public function file(string $token): self
     {
         $this->attachments[] = [
             'type' => 'file',
             'payload' => [
                 'token' => $token
             ],
-            'filename' => $filename,
-            'size' => $size
         ];
         return $this;
     }
@@ -387,22 +349,20 @@ class MessageBuilder
      */
     public static function textOnly(string $text, int $chatId): array
     {
-        return self::create($text)->chatId($chatId)->build();
+        return self::create($text)->build();
     }
 
     /**
      * Быстрый метод для создания сообщения с клавиатурой
      *
      * @param string $text Текст сообщения
-     * @param int $chatId ID чата
      * @param array $keyboard Клавиатура
      * @param bool $isOneTime Одноразовая клавиатура
      * @return array
      */
-    public static function withKeyboard(string $text, int $chatId, array $keyboard, bool $isOneTime = false): array
+    public static function withKeyboard(string $text, array $keyboard, bool $isOneTime = false): array
     {
         return self::create($text)
-            ->chatId($chatId)
             ->inlineKeyboard($keyboard, $isOneTime)
             ->build();
     }
@@ -411,14 +371,12 @@ class MessageBuilder
      * Быстрый метод для создания сообщения с изображением
      *
      * @param string $text Текст сообщения
-     * @param int $chatId ID чата
      * @param string $imageToken Токен изображения
      * @return array
      */
-    public static function withImage(string $text, int $chatId, string $imageToken): array
+    public static function withImage(string $text, string $imageToken): array
     {
         return self::create($text)
-            ->chatId($chatId)
             ->image($imageToken)
             ->build();
     }

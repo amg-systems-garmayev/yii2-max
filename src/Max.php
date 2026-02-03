@@ -60,7 +60,7 @@ class Max extends MaxBase
      */
     public function deleteWebhook($url)
     {
-        return parent::send('DELETE', 'subscriptions', [
+        return parent::send('DELETE', 'subscriptions', [], [
             'url' => $url
         ]);
     }
