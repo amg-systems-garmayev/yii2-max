@@ -58,9 +58,11 @@ class Max extends MaxBase
      * @return \garmayev\max\types\Response
      * @throws \GuzzleHttp\Exception\GuzzleException
      */
-    public function deleteWebhook()
+    public function deleteWebhook($url)
     {
-        return parent::send('DELETE', 'subscriptions');
+        return parent::send('DELETE', 'subscriptions', [
+            'url' => $url
+        ]);
     }
 
     /**

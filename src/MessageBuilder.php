@@ -48,6 +48,12 @@ class MessageBuilder
         return $this;
     }
 
+    public function format(string $format): self
+    {
+        $this->message['format'] = $format;
+        return $this;
+    }
+
     /**
      * Устанавливает chat_id
      *
