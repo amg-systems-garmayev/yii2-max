@@ -9,6 +9,7 @@ class ImagePayload extends Payload
     private ?string $_url;
     private ?string $_token;
     private ?array $_photos;
+  	public $photo_id;
 
     /**
      * @return string|null
