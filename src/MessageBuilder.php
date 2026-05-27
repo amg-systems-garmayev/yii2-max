@@ -219,6 +219,25 @@ class MessageBuilder
     }
 
     /**
+     * Добавляет изображение
+     *
+     * @param string $url Ссылка на изображение
+     * @return $this
+     */
+    public function imageUrl(string $url): self
+    {
+        $attachment = [
+            'type' => 'image',
+            'payload' => [
+                'url' => $url
+            ]
+        ];
+
+        $this->attachments[] = $attachment;
+        return $this;
+    }
+  
+    /**
      * Добавляет стикер
      *
      * @param string $code Код стикера
