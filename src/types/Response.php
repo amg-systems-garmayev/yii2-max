@@ -12,7 +12,7 @@ class Response extends Model
     private bool $_success;
     private ?array $_data;
     private ?string $_error;
-    private Message|string $_message = "";
+    private Message|array|string $_message = "";
     private ?int $_chat_id;
     private ?string $_chat_type;
     private ?string $_status;
