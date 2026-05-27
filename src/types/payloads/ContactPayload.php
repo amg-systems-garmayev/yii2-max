@@ -18,6 +18,7 @@ class ContactPayload extends Payload
     public array $_vcf_info;
     public ?string $_vcf_phone;
     public array $_max_info;
+    public $hash;
 
     public function __construct($config = [])
     {
