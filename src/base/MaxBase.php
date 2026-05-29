@@ -29,7 +29,6 @@ class MaxBase extends \yii\base\Component
         $this->client = new Client();
         $data = json_decode(file_get_contents("php://input"), true);
         if ($data) {
-//            \Yii::error($data);
             $this->request = new Request($data);
         }
     }
@@ -44,7 +43,7 @@ class MaxBase extends \yii\base\Component
      * @return \garmayev\max\types\Response
      * @throws GuzzleException
      */
-    public function send(string $method, string $action, array $data = [], ?array $args = null)
+    public function send(string $method, string $action, array $data = [], ?array $args = null, $postFields = null)
     {
         $url = $this->base . $action;
 
@@ -59,7 +58,6 @@ class MaxBase extends \yii\base\Component
                 'Authorization' => $this->access_token,
             ],
         ];
-
         // Для GET запросов данные передаем как query параметры
         if (strtoupper($method) === 'GET' && !empty($data)) {
             if (isset($options['query'])) {
@@ -67,10 +65,6 @@ class MaxBase extends \yii\base\Component
             } else {
                 $options['query'] = $data;
             }
-        }
-        // Для DELETE запросов не отправляем тело, если нет специальных данных
-        else if (strtoupper($method) === 'DELETE' && empty($data)) {
-            // Не добавляем body для простых DELETE запросов
         }
         // Для POST, PUT и DELETE с данными добавляем тело запроса
         else if (!empty($data)) {
@@ -80,9 +74,6 @@ class MaxBase extends \yii\base\Component
         try {
             $response = $this->client->request($method, $url, $options);
             $responseBody = $response->getBody()->getContents();
-
-            // Логируем ответ
-//            \Yii::error(['response' => json_decode($responseBody, true)]);
 
             return new \garmayev\max\types\Response(json_decode($responseBody, true));
 

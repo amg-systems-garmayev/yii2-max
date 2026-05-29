@@ -155,4 +155,179 @@ class Max extends MaxBase
             ]
         ], $args);
     }
+
+    /**
+     * Получение URL для загрузки файла
+     *
+     * @param string $type Тип загружаемого файла (image, video, audio, file)
+     * @return \garmayev\max\types\Response Ответ с полем 'url'
+     * @throws \GuzzleHttp\Exception\GuzzleException
+     */
+    public function getUploadUrl(string $type = 'file')
+    {
+        $allowedTypes = ['image', 'video', 'audio', 'file'];
+        if (!in_array($type, $allowedTypes)) {
+            throw new \InvalidArgumentException("Invalid upload type. Allowed: " . implode(', ', $allowedTypes));
+        }
+
+        return parent::send('POST', 'uploads', [], ['type' => $type]);
+    }
+
+    /**
+     * Загрузка файла по полученному URL (multipart upload)
+     *
+     * @param string $uploadUrl URL из метода getUploadUrl
+     * @param string $filePath Путь к файлу для загрузки
+     * @return array Ответ с токеном (token)
+     * @throws \GuzzleHttp\Exception\GuzzleException
+     */
+    public function uploadFile(string $uploadUrl, string $filePath)
+    {
+        if (!file_exists($filePath)) {
+            throw new \InvalidArgumentException("File not found: {$filePath}");
+        }
+
+        $mimeType = mime_content_type($filePath);
+        $fileName = basename($filePath);
+
+        $multipart = [
+            [
+                'name' => 'data',
+                'contents' => fopen($filePath, 'r'),
+                'filename' => $fileName,
+                'Mime-Type' => $mimeType ?: 'application/octet-stream'
+            ]
+        ];
+
+        $options = [
+            'headers' => [
+                'Authorization' => $this->access_token,
+            ],
+            'multipart' => $multipart,
+        ];
+
+        try {
+            $response = $this->client->request('POST', $uploadUrl, $options);
+            $responseBody = $response->getBody()->getContents();
+
+            return json_decode($responseBody, true);
+        } catch (\GuzzleHttp\Exception\GuzzleException $e) {
+            \Yii::error([
+                'error' => $e->getMessage(),
+                'url' => $uploadUrl,
+                'file' => $filePath
+            ]);
+            throw $e;
+        }
+    }
+
+    /**
+     * Полный цикл загрузки файла: получение URL и загрузка
+     *
+     * @param string $filePath Путь к файлу
+     * @param string $type Тип файла (image, video, audio, file)
+     * @param bool $waitProcessing Ждать ли обработки файла (по умолчанию false)
+     * @return array Результат с токеном и информацией о файле
+     * @throws \GuzzleHttp\Exception\GuzzleException
+     */
+    public function upload(string $filePath, string $type = 'file', bool $waitProcessing = false)
+    {
+        // 1. Получаем URL для загрузки
+        $uploadUrlResponse = $this->getUploadUrl($type);
+
+        if (!$uploadUrlResponse->isOk()) {
+            throw new \RuntimeException("Failed to get upload URL: " . $uploadUrlResponse->getDescription());
+        }
+
+        $uploadUrl = $uploadUrlResponse->getData()['url'] ?? null;
+
+        if (!$uploadUrl) {
+            throw new \RuntimeException("No upload URL received");
+        }
+
+        // 2. Загружаем файл
+        $uploadResult = $this->uploadFile($uploadUrl, $filePath);
+
+        // 3. Для видео/аудио токен может быть в ответе на загрузку
+        // Для файлов и изображений тоже возвращается токен
+        $result = [
+            'token' => $uploadResult['token'] ?? null,
+            'type' => $type,
+            'file_path' => $filePath,
+        ];
+
+        // 4. Для видео и аудио может потребоваться дополнительная обработка
+        if ($type === 'video' || $type === 'audio') {
+            // В ответе на получение URL для видео/аудио может быть token
+            // который нужно использовать в сообщении
+            $responseData = $uploadUrlResponse->getData();
+            if (isset($responseData['token'])) {
+                $result['token_from_url'] = $responseData['token'];
+            }
+        }
+
+        // 5. Если нужно дождаться обработки (для больших файлов)
+        if ($waitProcessing && ($type === 'video' || $type === 'audio')) {
+            // Рекомендуемая пауза после загрузки больших файлов
+            sleep(3);
+        }
+
+        return $result;
+    }
+
+    /**
+     * Создание вложения для сообщения
+     *
+     * @param string $token Токен загруженного файла
+     * @param string $type Тип вложения (image, video, audio, file)
+     * @return array
+     */
+    public function createAttachment(string $token, string $type = 'file'): array
+    {
+        $allowedTypes = ['image', 'video', 'audio', 'file'];
+        if (!in_array($type, $allowedTypes)) {
+            throw new \InvalidArgumentException("Invalid attachment type. Allowed: " . implode(', ', $allowedTypes));
+        }
+
+        return [
+            'type' => $type,
+            'payload' => [
+                'token' => $token
+            ]
+        ];
+    }
+
+    /**
+     * Отправка сообщения с вложением (упрощенный метод)
+     *
+     * @param string|int $recipientId ID получателя (user_id или chat_id)
+     * @param string $text Текст сообщения
+     * @param string $fileToken Токен загруженного файла
+     * @param string $fileType Тип файла (image, video, audio, file)
+     * @param string $chatType Тип чата (user, chat, channel)
+     * @return \garmayev\max\types\Response
+     * @throws \GuzzleHttp\Exception\GuzzleException
+     */
+    public function sendMessageWithAttachment($recipientId, string $text, string $fileToken, string $fileType = 'image', string $chatType = 'user')
+    {
+        $attachment = $this->createAttachment($fileToken, $fileType);
+
+        $params = [
+            'text' => $text,
+            'attachments' => [$attachment]
+        ];
+
+        $args = [
+            'user_id' => $recipientId,
+            'chat_type' => $chatType
+        ];
+
+        // Для чатов и каналов используем chat_id
+        if ($chatType !== 'user') {
+            $args['chat_id'] = $recipientId;
+            unset($args['user_id']);
+        }
+
+        return $this->sendMessage($params, $args);
+    }
 }

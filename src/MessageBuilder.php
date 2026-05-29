@@ -2,6 +2,8 @@
 
 namespace garmayev\max;
 
+use GuzzleHttp\Client;
+use GuzzleHttp\Exception\GuzzleException;
 use garmayev\max\types\buttons\Callback;
 use garmayev\max\types\buttons\Link;
 use garmayev\max\types\buttons\Message as MessageButton;
@@ -16,6 +18,7 @@ class MessageBuilder
 {
     private array $message = [];
     private array $attachments = [];
+    private Client $client;
 
     /**
      * Создает новый экземпляр конструктора сообщений
@@ -48,6 +51,12 @@ class MessageBuilder
         return $this;
     }
 
+    /**
+     * Устанавливает формат сообщения
+     *
+     * @param string $format Формат (markdown, html и т.д.)
+     * @return $this
+     */
     public function format(string $format): self
     {
         $this->message['format'] = $format;
@@ -186,57 +195,65 @@ class MessageBuilder
 
     /**
      * Добавляет изображение
+     * Если передан URL - файл будет загружен автоматически
      *
-     * @param string $token Токен изображения
+     * @param string $tokenOrUrl Токен (уже загружен) или URL файла
      * @param string|null $filename Имя файла
      * @param int|null $width Ширина
      * @param int|null $height Высота
      * @return $this
+     * @throws \Exception
      */
-    public function image(string $token, ?string $filename = null, ?int $width = null, ?int $height = null): self
+    public function image(string $tokenOrUrl, ?string $filename = null, ?int $width = null, ?int $height = null): self
     {
-        $attachment = [
-            'type' => 'image',
-            'payload' => [
-                'token' => $token
-            ]
-        ];
+        if ($this->isUrl($tokenOrUrl)) {
+            $token = $this->uploadFileFromUrl($tokenOrUrl, 'image');
+            $attachment = [
+                'type' => 'image',
+                'payload' => [
+                    'token' => $token
+                ]
+            ];
 
-        if ($filename !== null) {
-            $attachment['filename'] = $filename;
+            if ($filename !== null) {
+                $attachment['filename'] = $filename;
+            }
+
+            if ($width !== null) {
+                $attachment['width'] = $width;
+            }
+
+            if ($height !== null) {
+                $attachment['height'] = $height;
+            }
+
+            $this->attachments[] = $attachment;
+        } else {
+            $attachment = [
+                'type' => 'image',
+                'payload' => [
+                    'token' => $tokenOrUrl
+                ]
+            ];
+
+            if ($filename !== null) {
+                $attachment['filename'] = $filename;
+            }
+
+            if ($width !== null) {
+                $attachment['width'] = $width;
+            }
+
+            if ($height !== null) {
+                $attachment['height'] = $height;
+            }
+
+            $this->attachments[] = $attachment;
         }
 
-        if ($width !== null) {
-            $attachment['width'] = $width;
-        }
-
-        if ($height !== null) {
-            $attachment['height'] = $height;
-        }
-
-        $this->attachments[] = $attachment;
         return $this;
     }
 
-    /**
-     * Добавляет изображение
-     *
-     * @param string $url Ссылка на изображение
-     * @return $this
-     */
-    public function imageUrl(string $url): self
-    {
-        $attachment = [
-            'type' => 'image',
-            'payload' => [
-                'url' => $url
-            ]
-        ];
-
-        $this->attachments[] = $attachment;
-        return $this;
-    }
-  
     /**
      * Добавляет стикер
      *
@@ -256,20 +273,104 @@ class MessageBuilder
 
     /**
      * Добавляет файл
+     * Если передан URL - файл будет загружен автоматически
      *
-     * @param string $token Токен файла
-     * @param string $filename Имя файла
-     * @param int $size Размер файла
+     * @param string $tokenOrUrl Токен (уже загружен) или URL файла
+     * @param string|null $filename Имя файла
      * @return $this
+     * @throws \Exception
      */
-    public function file(string $token): self
+    public function file(string $tokenOrUrl, ?string $filename = null): self
     {
-        $this->attachments[] = [
-            'type' => 'file',
-            'payload' => [
-                'token' => $token
-            ],
-        ];
+        if ($this->isUrl($tokenOrUrl)) {
+            $token = $this->uploadFileFromUrl($tokenOrUrl, 'file');
+            $attachment = [
+                'type' => 'file',
+                'payload' => [
+                    'token' => $token
+                ]
+            ];
+
+            if ($filename !== null) {
+                $attachment['filename'] = $filename;
+            }
+
+            $this->attachments[] = $attachment;
+        } else {
+            $attachment = [
+                'type' => 'file',
+                'payload' => [
+                    'token' => $tokenOrUrl
+                ]
+            ];
+
+            if ($filename !== null) {
+                $attachment['filename'] = $filename;
+            }
+
+            $this->attachments[] = $attachment;
+        }
+
+        return $this;
+    }
+
+    /**
+     * Добавляет видео
+     * Если передан URL - файл будет загружен автоматически
+     *
+     * @param string $tokenOrUrl Токен (уже загружен) или URL файла
+     * @return $this
+     * @throws \Exception
+     */
+    public function video(string $tokenOrUrl): self
+    {
+        if ($this->isUrl($tokenOrUrl)) {
+            $token = $this->uploadFileFromUrl($tokenOrUrl, 'video');
+            $this->attachments[] = [
+                'type' => 'video',
+                'payload' => [
+                    'token' => $token
+                ]
+            ];
+        } else {
+            $this->attachments[] = [
+                'type' => 'video',
+                'payload' => [
+                    'token' => $tokenOrUrl
+                ]
+            ];
+        }
+
+        return $this;
+    }
+
+    /**
+     * Добавляет аудио
+     * Если передан URL - файл будет загружен автоматически
+     *
+     * @param string $tokenOrUrl Токен (уже загружен) или URL файла
+     * @return $this
+     * @throws \Exception
+     */
+    public function audio(string $tokenOrUrl): self
+    {
+        if ($this->isUrl($tokenOrUrl)) {
+            $token = $this->uploadFileFromUrl($tokenOrUrl, 'audio');
+            $this->attachments[] = [
+                'type' => 'audio',
+                'payload' => [
+                    'token' => $token
+                ]
+            ];
+        } else {
+            $this->attachments[] = [
+                'type' => 'audio',
+                'payload' => [
+                    'token' => $tokenOrUrl
+                ]
+            ];
+        }
+
         return $this;
     }
 
@@ -322,6 +423,78 @@ class MessageBuilder
     }
 
     /**
+     * Проверяет, является ли строка URL
+     *
+     * @param string $string
+     * @return bool
+     */
+    private function isUrl(string $string): bool
+    {
+        return filter_var($string, FILTER_VALIDATE_URL) !== false;
+    }
+
+    /**
+     * Скачивает файл по URL во временный файл с использованием Guzzle
+     *
+     * @param string $url
+     * @return string Путь к временному файлу
+     * @throws GuzzleException
+     */
+    private function downloadFromUrl(string $url): string
+    {
+        $tempFile = tempnam(sys_get_temp_dir(), 'max_upload_');
+
+        $this->client = $this->client ?: new Client();
+
+        $this->client->request('GET', $url, [
+            'sink' => $tempFile,
+            'timeout' => 300,
+            'verify' => false
+        ]);
+
+        return $tempFile;
+    }
+
+    /**
+     * Загружает файл из URL на сервер MAX
+     *
+     * @param string $url URL файла
+     * @param string $type Тип файла (image, video, audio, file)
+     * @return string Токен загруженного файла
+     * @throws \Exception
+     */
+    private function uploadFileFromUrl(string $url, string $type): string
+    {
+        $max = \Yii::$app->max;
+
+        if (!$max) {
+            throw new \RuntimeException('Max component is not available in Yii::$app->max');
+        }
+
+        $tempFile = null;
+
+        try {
+            // Скачиваем файл во временную папку
+            $tempFile = $this->downloadFromUrl($url);
+
+            // Загружаем файл на сервер MAX
+            $result = $max->upload($tempFile, $type);
+
+            if (!isset($result['token'])) {
+                throw new \Exception("Failed to upload file from URL: {$url}. No token received.");
+            }
+
+            return $result['token'];
+
+        } finally {
+            // Удаляем временный файл
+            if ($tempFile && file_exists($tempFile)) {
+                unlink($tempFile);
+            }
+        }
+    }
+
+    /**
      * Создает строку кнопок для клавиатуры
      *
      * @param array $buttons Массив кнопок
@@ -357,46 +530,5 @@ class MessageBuilder
         }
 
         return $result;
-    }
-
-    /**
-     * Быстрый метод для создания сообщения с текстом
-     *
-     * @param string $text Текст сообщения
-     * @param int $chatId ID чата
-     * @return array
-     */
-    public static function textOnly(string $text, int $chatId): array
-    {
-        return self::create($text)->build();
-    }
-
-    /**
-     * Быстрый метод для создания сообщения с клавиатурой
-     *
-     * @param string $text Текст сообщения
-     * @param array $keyboard Клавиатура
-     * @param bool $isOneTime Одноразовая клавиатура
-     * @return array
-     */
-    public static function withKeyboard(string $text, array $keyboard, bool $isOneTime = false): array
-    {
-        return self::create($text)
-            ->inlineKeyboard($keyboard, $isOneTime)
-            ->build();
-    }
-
-    /**
-     * Быстрый метод для создания сообщения с изображением
-     *
-     * @param string $text Текст сообщения
-     * @param string $imageToken Токен изображения
-     * @return array
-     */
-    public static function withImage(string $text, string $imageToken): array
-    {
-        return self::create($text)
-            ->image($imageToken)
-            ->build();
     }
 }
