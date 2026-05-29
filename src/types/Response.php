@@ -12,13 +12,17 @@ class Response extends Model
     private bool $_success;
     private ?array $_data;
     private ?string $_error;
-    private Message|array|string|null $_message = "";
+    private Message|array|string $_message = "";
     private ?int $_chat_id;
     private ?string $_chat_type;
     private ?string $_status;
     private ?array $_subscriptions;
     private ?array $_recipient;
     private ?array $_body;
+    
+    // Новые поля для загрузки файлов
+    private ?string $_url;
+    private ?string $_token;
     
     /**
      * Конструктор
@@ -39,6 +43,10 @@ class Response extends Model
         $this->_subscriptions = $data['subscriptions'] ?? [];
         $this->_recipient = $data['recipient'] ?? [];
         $this->_body = $data['body'] ?? [];
+        
+        // Инициализация полей для загрузки файлов
+        $this->_url = $data['url'] ?? null;
+        $this->_token = $data['token'] ?? null;
     }
 
     /**
@@ -163,5 +171,97 @@ class Response extends Model
     public function setBody(?array $body): void
     {
         $this->_body = $body;
+    }
+
+    /**
+     * Получает URL для загрузки файла
+     *
+     * @return string|null
+     */
+    public function getUrl(): ?string
+    {
+        // Сначала проверяем прямое поле url
+        if ($this->_url !== null) {
+            return $this->_url;
+        }
+        
+        // Затем проверяем в data
+        if (is_array($this->_data) && isset($this->_data['url'])) {
+            return $this->_data['url'];
+        }
+        
+        return null;
+    }
+
+    /**
+     * Устанавливает URL для загрузки файла
+     *
+     * @param string|null $url
+     */
+    public function setUrl(?string $url): void
+    {
+        $this->_url = $url;
+    }
+
+    /**
+     * Получает токен файла (для видео/аудио)
+     *
+     * @return string|null
+     */
+    public function getToken(): ?string
+    {
+        // Сначала проверяем прямое поле token
+        if ($this->_token !== null) {
+            return $this->_token;
+        }
+        
+        // Затем проверяем в data
+        if (is_array($this->_data) && isset($this->_data['token'])) {
+            return $this->_data['token'];
+        }
+        
+        return null;
+    }
+
+    /**
+     * Устанавливает токен файла
+     *
+     * @param string|null $token
+     */
+    public function setToken(?string $token): void
+    {
+        $this->_token = $token;
+    }
+
+    /**
+     * Магический метод для доступа к свойствам
+     *
+     * @param string $name
+     * @return mixed
+     */
+    public function __get($name)
+    {
+        $method = 'get' . ucfirst($name);
+        if (method_exists($this, $method)) {
+            return $this->$method();
+        }
+        
+        return parent::__get($name);
+    }
+
+    /**
+     * Магический метод для проверки существования свойства
+     *
+     * @param string $name
+     * @return bool
+     */
+    public function __isset($name)
+    {
+        $method = 'get' . ucfirst($name);
+        if (method_exists($this, $method)) {
+            return $this->$method() !== null;
+        }
+        
+        return parent::__isset($name);
     }
 }
