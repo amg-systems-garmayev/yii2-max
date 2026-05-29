@@ -241,14 +241,11 @@ class Max extends MaxBase
         // 1. Получаем URL для загрузки
         $uploadUrlResponse = $this->getUploadUrl($type);
 
-        // Получаем данные ответа
-        $responseData = $uploadUrlResponse->getData();
-
-        // Проверяем наличие URL в ответе
-        $uploadUrl = $responseData['url'] ?? null;
+        // Используем новый метод getUrl() из класса Response
+        $uploadUrl = $uploadUrlResponse->getUrl();
 
         if (!$uploadUrl) {
-            throw new \RuntimeException("Failed to get upload URL. Response: " . json_encode($responseData));
+            throw new \RuntimeException("Failed to get upload URL. Response: " . json_encode($uploadUrlResponse->getData()));
         }
 
         // 2. Загружаем файл по полученному URL
