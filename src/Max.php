@@ -229,46 +229,49 @@ class Max extends MaxBase
      * @param bool $waitProcessing Ждать ли обработки файла (по умолчанию false)
      * @return array Результат с токеном и информацией о файле
      * @throws \GuzzleHttp\Exception\GuzzleException
+     * @throws \Exception
      */
     public function upload(string $filePath, string $type = 'file', bool $waitProcessing = false)
     {
+        // Проверяем существование файла
+        if (!file_exists($filePath)) {
+            throw new \InvalidArgumentException("File not found: {$filePath}");
+        }
+
         // 1. Получаем URL для загрузки
         $uploadUrlResponse = $this->getUploadUrl($type);
 
-        if (!$uploadUrlResponse->isOk()) {
-            throw new \RuntimeException("Failed to get upload URL: " . $uploadUrlResponse->getDescription());
-        }
+        // Получаем данные ответа
+        $responseData = $uploadUrlResponse->getData();
 
-        $uploadUrl = $uploadUrlResponse->getData()['url'] ?? null;
+        // Проверяем наличие URL в ответе
+        $uploadUrl = $responseData['url'] ?? null;
 
         if (!$uploadUrl) {
-            throw new \RuntimeException("No upload URL received");
+            throw new \RuntimeException("Failed to get upload URL. Response: " . json_encode($responseData));
         }
 
-        // 2. Загружаем файл
+        // 2. Загружаем файл по полученному URL
         $uploadResult = $this->uploadFile($uploadUrl, $filePath);
 
-        // 3. Для видео/аудио токен может быть в ответе на загрузку
-        // Для файлов и изображений тоже возвращается токен
+        // 3. Получаем токен из ответа загрузки
+        $token = $uploadResult['token'] ?? null;
+
+        if (!$token) {
+            throw new \RuntimeException("Failed to get token after file upload. Response: " . json_encode($uploadResult));
+        }
+
+        // 4. Формируем результат
         $result = [
-            'token' => $uploadResult['token'] ?? null,
+            'token' => $token,
             'type' => $type,
             'file_path' => $filePath,
         ];
 
-        // 4. Для видео и аудио может потребоваться дополнительная обработка
-        if ($type === 'video' || $type === 'audio') {
-            // В ответе на получение URL для видео/аудио может быть token
-            // который нужно использовать в сообщении
-            $responseData = $uploadUrlResponse->getData();
-            if (isset($responseData['token'])) {
-                $result['token_from_url'] = $responseData['token'];
-            }
-        }
-
-        // 5. Если нужно дождаться обработки (для больших файлов)
+        // 5. Для видео и аудио может потребоваться дополнительная обработка
         if ($waitProcessing && ($type === 'video' || $type === 'audio')) {
             // Рекомендуемая пауза после загрузки больших файлов
+            // для их обработки на сервере MAX
             sleep(3);
         }
 
