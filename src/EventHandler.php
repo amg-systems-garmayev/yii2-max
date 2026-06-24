@@ -271,11 +271,11 @@ class EventHandler
      */
     public function regex(string $pattern, callable $handler): self
     {
-        $this->on(Update::TYPE_MESSAGE_CREATED, function (Message $message) use ($pattern, $handler) {
-            $messageText = $message->body->text ?? '';
+        $this->on(Update::TYPE_MESSAGE_CREATED, function (Request $request) use ($pattern, $handler) {
+            $messageText = $request->message->body->text ?? '';
 
             if (preg_match($pattern, $messageText, $matches)) {
-                $handler($message, $matches);
+                $handler($request, $matches);
                 return true;
             }
 
