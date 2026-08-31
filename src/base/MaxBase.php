@@ -16,7 +16,7 @@ class MaxBase extends \yii\base\Component
 {
     public string $access_token;
     public string $secret;
-    protected string $base = "https://platform-api.max.ru/";
+    protected string $base = "https://platform-api2.max.ru/";
     protected Client $client;
     public Request $request;
     public Response $response;

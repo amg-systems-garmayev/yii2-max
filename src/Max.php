@@ -52,6 +52,11 @@ class Max extends MaxBase
         ]);
     }
 
+    public function getWebhooks()
+    {
+        return parent::send('GET', 'subscriptions');
+    }
+
     /**
      * Удаление вебхука
      *

@@ -36,6 +36,9 @@ class Attachment extends Model
     private int $_width;
     private int $_height;
     public $callback_id;
+    public $title;
+    public $description;
+    public $image_url;
 
     public function __construct($config = [])
     {
