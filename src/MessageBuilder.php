@@ -18,7 +18,7 @@ class MessageBuilder
 {
     private array $message = [];
     private array $attachments = [];
-    private Client $client;
+    private ?Client $client = null;
 
     /**
      * Создает новый экземпляр конструктора сообщений
