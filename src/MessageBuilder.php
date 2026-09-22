@@ -430,7 +430,12 @@ class MessageBuilder
      */
     private function isUrl(string $string): bool
     {
-        return filter_var($string, FILTER_VALIDATE_URL) !== false;
+        // Отсекаем пустые строки и уже-токены (короткие base64-подобные строки без схемы)
+        if ($string === '' || preg_match('/^[a-zA-Z][a-zA-Z0-9+.-]*:\/\//', $string)) {
+            // Явно начинается со схемы http:// https:// ftp:// и т.п.
+            return (bool) preg_match('#^https?://#i', $string);
+        }
+        return false;
     }
 
     /**
