@@ -18,19 +18,25 @@ class MessageBuilder
 {
     private array $message = [];
     private array $attachments = [];
+    private bool $attachmentsChanged = false;
     private ?Client $client = null;
 
     /**
      * Создает новый экземпляр конструктора сообщений
      *
      * @param string|null $text Текст сообщения
-     * @param array $args Дополнительные аргументы (chat_id, chat_type, user_id)
+     * @param array $args Дополнительные поля тела сообщения, включая attachments
      * @return MessageBuilder
      */
     public static function create(?string $text = null, array $args = []): self
     {
         $builder = new self();
         $builder->message = $args;
+        if (isset($args['attachments'])) {
+            $builder->attachments = $args['attachments'];
+            unset($builder->message['attachments']);
+            $builder->attachmentsChanged = true;
+        }
 
         if ($text !== null) {
             $builder->text($text);
@@ -72,6 +78,7 @@ class MessageBuilder
      */
     public function inlineKeyboard(array $buttons, bool $isOneTime = false): self
     {
+        $this->removeKeyboard();
         $this->attachments[] = [
             'type' => 'inline_keyboard',
             'payload' => [
@@ -79,6 +86,19 @@ class MessageBuilder
                 'one_time' => $isOneTime
             ]
         ];
+        return $this;
+    }
+
+    /**
+     * Удаляет клавиатуры, сохраняя остальные вложения текущего builder.
+     * Для редактирования передайте в create() все сохраняемые вложения.
+     */
+    public function removeKeyboard(): self
+    {
+        $this->attachments = array_values(array_filter($this->attachments, function (array $attachment) {
+            return ($attachment['type'] ?? null) !== 'inline_keyboard';
+        }));
+        $this->attachmentsChanged = true;
         return $this;
     }
 
@@ -207,7 +227,7 @@ class MessageBuilder
     public function image(string $tokenOrUrl, ?string $filename = null, ?int $width = null, ?int $height = null): self
     {
         if ($this->isUrl($tokenOrUrl)) {
-            $token = $this->uploadFileFromUrl($tokenOrUrl, 'image');
+            $token = $this->uploadFileFromUrl($tokenOrUrl, 'image', $filename);
             $attachment = [
                 'type' => 'image',
                 'payload' => [
@@ -283,7 +303,7 @@ class MessageBuilder
     public function file(string $tokenOrUrl, ?string $filename = null): self
     {
         if ($this->isUrl($tokenOrUrl)) {
-            $token = $this->uploadFileFromUrl($tokenOrUrl, 'file');
+            $token = $this->uploadFileFromUrl($tokenOrUrl, 'file', $filename);
             $attachment = [
                 'type' => 'file',
                 'payload' => [
@@ -448,14 +468,21 @@ class MessageBuilder
     private function downloadFromUrl(string $url): string
     {
         $tempFile = tempnam(sys_get_temp_dir(), 'max_upload_');
+        if ($tempFile === false) {
+            throw new \RuntimeException('Failed to create temporary upload file');
+        }
 
         $this->client = $this->client ?: new Client();
 
-        $this->client->request('GET', $url, [
-            'sink' => $tempFile,
-            'timeout' => 300,
-            'verify' => false
-        ]);
+        try {
+            $this->client->request('GET', $url, [
+                'sink' => $tempFile,
+                'timeout' => 300,
+            ]);
+        } catch (\Throwable $e) {
+            unlink($tempFile);
+            throw $e;
+        }
 
         return $tempFile;
     }
@@ -468,7 +495,7 @@ class MessageBuilder
      * @return string Токен загруженного файла
      * @throws \Exception
      */
-    private function uploadFileFromUrl(string $url, string $type): string
+    private function uploadFileFromUrl(string $url, string $type, ?string $filename = null): string
     {
         $max = \Yii::$app->max;
 
@@ -483,7 +510,8 @@ class MessageBuilder
             $tempFile = $this->downloadFromUrl($url);
 
             // Загружаем файл на сервер MAX
-            $result = $max->upload($tempFile, $type);
+            $filename = $filename ?? basename(rawurldecode(parse_url($url, PHP_URL_PATH) ?: ''));
+            $result = $max->upload($tempFile, $type, false, $filename ?: null);
 
             if (!isset($result['token'])) {
                 throw new \Exception("Failed to upload file from URL: {$url}. No token received.");
@@ -530,7 +558,21 @@ class MessageBuilder
     {
         $result = $this->message;
 
-        if (!empty($this->attachments)) {
+        if (count($this->attachments) > 12) {
+            throw new \InvalidArgumentException('A message can contain at most 12 attachments');
+        }
+        $types = array_column($this->attachments, 'type');
+        if (count(array_filter($types, function ($type) { return $type === 'inline_keyboard'; })) > 1) {
+            throw new \InvalidArgumentException('A message can contain only one inline keyboard');
+        }
+        if (in_array('file', $types, true)) {
+            $otherTypes = array_filter($types, function ($type) { return $type !== 'inline_keyboard'; });
+            if (count($otherTypes) !== 1) {
+                throw new \InvalidArgumentException('A file can only be combined with an inline keyboard');
+            }
+        }
+
+        if ($this->attachmentsChanged || !empty($this->attachments)) {
             $result['attachments'] = $this->attachments;
         }
 

@@ -5,9 +5,9 @@ class MessageBody extends \yii\base\Model
 {
     private string $_mid;
     private int $_seq;
-    private string $_text;
-    private array $_attachments;
-    private array $_markup;
+    private ?string $_text = null;
+    private array $_attachments = [];
+    private array $_markup = [];
 
     /**
      * @return string
@@ -74,10 +74,12 @@ class MessageBody extends \yii\base\Model
      */
     public function setAttachments($value)
     {
-        foreach ($value as $item)
+        $attachments = [];
+        foreach ($value ?? [] as $item)
         {
-            $this->_attachments[] = new Attachment($item);
+            $attachments[] = new Attachment($item);
         }
+        $this->_attachments = $attachments;
     }
 
     /**

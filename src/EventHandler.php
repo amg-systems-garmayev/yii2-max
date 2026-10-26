@@ -202,7 +202,11 @@ class EventHandler
      */
     public function command(string $command, callable $handler): self
     {
-        $this->on(Update::TYPE_MESSAGE_CREATED, function (Message $message) use ($command, $handler) {
+        $this->on(Update::TYPE_MESSAGE_CREATED, function (Request $request) use ($command, $handler) {
+            $message = $request->getMessage();
+            if ($message === null) {
+                return false;
+            }
             $text = $message->body->text ?? '';
 
             // Проверяем, начинается ли текст с команды
@@ -248,7 +252,11 @@ class EventHandler
      */
     public function contains(string $text, callable $handler): self
     {
-        $this->on(Update::TYPE_MESSAGE_CREATED, function (Message $message) use ($text, $handler) {
+        $this->on(Update::TYPE_MESSAGE_CREATED, function (Request $request) use ($text, $handler) {
+            $message = $request->getMessage();
+            if ($message === null) {
+                return false;
+            }
             $messageText = $message->body->text ?? '';
 
             if (stripos($messageText, $text) !== false) {

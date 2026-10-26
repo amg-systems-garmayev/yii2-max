@@ -183,24 +183,29 @@ class Max extends MaxBase
      *
      * @param string $uploadUrl URL из метода getUploadUrl
      * @param string $filePath Путь к файлу для загрузки
-     * @return array Ответ с токеном (token)
+     * @param string|null $filename Исходное имя файла для multipart
+     * @return array JSON-ответ или пустой массив при успешном XML-подтверждении
      * @throws \GuzzleHttp\Exception\GuzzleException
      */
-    public function uploadFile(string $uploadUrl, string $filePath)
+    public function uploadFile(string $uploadUrl, string $filePath, ?string $filename = null)
     {
-        if (!file_exists($filePath)) {
+        if (!is_file($filePath) || !is_readable($filePath)) {
             throw new \InvalidArgumentException("File not found: {$filePath}");
         }
 
         $mimeType = mime_content_type($filePath);
-        $fileName = basename($filePath);
+        $fileName = $filename ?? basename($filePath);
+        $stream = fopen($filePath, 'rb');
+        if ($stream === false) {
+            throw new \RuntimeException("Failed to open file: {$filePath}");
+        }
 
         $multipart = [
             [
                 'name' => 'data',
-                'contents' => fopen($filePath, 'r'),
+                'contents' => $stream,
                 'filename' => $fileName,
-                'Mime-Type' => $mimeType ?: 'application/octet-stream'
+                'headers' => ['Content-Type' => $mimeType ?: 'application/octet-stream']
             ]
         ];
 
@@ -215,7 +220,18 @@ class Max extends MaxBase
             $response = $this->client->request('POST', $uploadUrl, $options);
             $responseBody = $response->getBody()->getContents();
 
-            return json_decode($responseBody, true);
+            $data = json_decode($responseBody, true);
+            if (is_array($data)) {
+                if (!empty($data['error']) || (isset($data['success']) && $data['success'] === false)) {
+                    throw new \RuntimeException('Media upload failed');
+                }
+                return $data;
+            }
+            // Аудио/видео подтверждают успешную загрузку XML, токен уже выдан /uploads.
+            if (preg_match('~^(?:<\?xml[^>]*\?>\s*)?<retval>\s*1\s*</retval>$~', trim($responseBody))) {
+                return [];
+            }
+            throw new \RuntimeException('Unexpected media upload response');
         } catch (\GuzzleHttp\Exception\GuzzleException $e) {
             \Yii::error([
                 'error' => $e->getMessage(),
@@ -223,6 +239,10 @@ class Max extends MaxBase
                 'file' => $filePath
             ]);
             throw $e;
+        } finally {
+            if (is_resource($stream)) {
+                fclose($stream);
+            }
         }
     }
 
@@ -231,12 +251,13 @@ class Max extends MaxBase
      *
      * @param string $filePath Путь к файлу
      * @param string $type Тип файла (image, video, audio, file)
-     * @param bool $waitProcessing Ждать ли обработки файла (по умолчанию false)
+     * @param bool $waitProcessing Сделать паузу 3 секунды для аудио/видео (не гарантирует готовность)
+     * @param string|null $filename Исходное имя файла для multipart
      * @return array Результат с токеном и информацией о файле
      * @throws \GuzzleHttp\Exception\GuzzleException
      * @throws \Exception
      */
-    public function upload(string $filePath, string $type = 'file', bool $waitProcessing = false)
+    public function upload(string $filePath, string $type = 'file', bool $waitProcessing = false, ?string $filename = null)
     {
         // Проверяем существование файла
         if (!file_exists($filePath)) {
@@ -254,12 +275,23 @@ class Max extends MaxBase
         }
 
         // 2. Загружаем файл по полученному URL
-        $uploadResult = $this->uploadFile($uploadUrl, $filePath);
+        $uploadResult = $this->uploadFile($uploadUrl, $filePath, $filename);
 
         // 3. Получаем токен из ответа загрузки
         $token = $uploadResult['token'] ?? null;
+        if ($type === 'image' && !$token) {
+            foreach ($uploadResult['photos'] ?? [] as $photo) {
+                if (is_array($photo) && !empty($photo['token'])) {
+                    $token = $photo['token'];
+                    break;
+                }
+            }
+        }
+        if (($type === 'video' || $type === 'audio') && !$token) {
+            $token = $uploadUrlResponse->getToken();
+        }
 
-        if (!$token) {
+        if (!is_string($token) || $token === '') {
             throw new \RuntimeException("Failed to get token after file upload. Response: " . json_encode($uploadResult));
         }
 

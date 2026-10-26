@@ -15,7 +15,7 @@ class ContactPayload extends Payload
 {
     private ?string $_name;
     private ?int $_contact_id;
-    public array $_vcf_info;
+    public ?array $_vcf_info = null;
     public ?string $_vcf_phone;
     public array $_max_info;
     public $hash;
@@ -78,7 +78,7 @@ class ContactPayload extends Payload
      */
     public function setVcf_info(?string $vcf_info): void
     {
-        $this->_vcf_info = VCardParser::parseQuick($vcf_info);
+        $this->_vcf_info = $vcf_info === null ? null : VCardParser::parseQuick($vcf_info);
     }
 
     /**
@@ -105,6 +105,6 @@ class ContactPayload extends Payload
 
     public function setMax_info($max_info)
     {
-        $this->_max_info = $max_info;
+        $this->_max_info = $max_info ?? [];
     }
 }

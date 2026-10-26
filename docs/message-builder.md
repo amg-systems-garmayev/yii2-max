@@ -29,6 +29,69 @@ MessageBuilder - это строитель (builder) сообщений для �
 - Гибкость в создании сложных сообщений
 
 # Основные методы
+
+## Удаление клавиатуры
+
+`removeKeyboard(): self` удаляет все вложения `inline_keyboard` из текущего builder и сохраняет остальные вложения. Повторный вызов безопасен. `inlineKeyboard()` заменяет ранее установленную клавиатуру.
+
+Для сообщения, содержащего только текст и кнопки:
+
+```php
+$params = MessageBuilder::create()->removeKeyboard()->build();
+Yii::$app->max->editMessage($params, ['message_id' => $messageId]);
+// JSON: {"attachments":[]}
+```
+
+При редактировании сообщения с медиа необходимо передать все сохраняемые вложения в формате AttachmentRequest. Например, если известны токены фотографии и видео:
+
+```php
+$params = MessageBuilder::create()
+    ->image($photoToken)
+    ->video($videoToken)
+    ->removeKeyboard()
+    ->build();
+Yii::$app->max->editMessage($params, ['message_id' => $messageId]);
+```
+
+Можно передать существующий массив запросных вложений: `MessageBuilder::create(null, ['attachments' => $attachments])->removeKeyboard()->build()`. Объекты входящих моделей сначала нужно преобразовать в массивы AttachmentRequest; массивы ответа API также могут содержать поля, не подходящие для отправки.
+
+Важно: API заменяет список вложений целиком. Вызов на пустом builder отправляет `attachments: []` и удаляет **все** вложения существующего сообщения, включая медиа. Builder не получает содержимое сообщения с сервера автоматически. Если поле `attachments` вообще не отправлять, API оставит вложения без изменений.
+
+## Отправка медиа
+
+```php
+// Отправка локального изображения: сначала загрузка, затем сообщение.
+$uploaded = Yii::$app->max->upload('/absolute/path/photo.jpg', 'image');
+$params = MessageBuilder::create('Фотография')->image($uploaded['token'])->build();
+Yii::$app->max->sendMessage($params, ['chat_id' => $chatId]);
+
+// Уже загруженные токены; подпись необязательна.
+$params = MessageBuilder::create()->video($videoToken)->image($photoToken)->build();
+Yii::$app->max->sendMessage($params, ['chat_id' => $chatId]);
+
+// Для аудио используйте audio(), для документа — file().
+$params = MessageBuilder::create('Документ')->file($fileToken)->build();
+Yii::$app->max->sendMessage($params, ['user_id' => $userId]);
+
+// HTTP(S) URL автоматически скачивается и загружается через компонент Yii::$app->max.
+$params = MessageBuilder::create()->video('https://example.com/video.mp4')->build();
+Yii::$app->max->sendMessage($params, ['chat_id' => $chatId]);
+```
+
+`image()`, `video()`, `audio()`, `file()` принимают токен или HTTP(S) URL, но не локальный путь. Для локального файла используйте `Max::upload()`. При скачивании по URL сохраняется имя из пути URL; для изображений и документов его можно переопределить параметром `$filename`. `Max::upload()` также принимает исходное имя четвёртым параметром, `Max::uploadFile()` — третьим.
+
+Получатель (`chat_id` или `user_id`) и ID редактируемого сообщения передаются вторым аргументом `sendMessage()` / `editMessage()`, отдельно от тела builder.
+
+Поддержаны разные форматы ответов загрузки: `photos.*.token` для изображений, токен из `POST /uploads` и XML-подтверждение загрузки для аудио/видео, верхнеуровневый `token` для файлов. Потоки файлов закрываются после запроса; временные файлы удаляются и при ошибках.
+
+Builder отклоняет больше 12 вложений, несколько клавиатур и сочетание документа `file` с другими медиа. Документ можно сочетать только с одной клавиатурой. Это не полная локальная проверка всех ограничений API: формат, размер, длительность и готовность медиа проверяет MAX.
+
+После загрузки MAX обрабатывает медиа асинхронно и может вернуть `attachment.not.ready`. Сохраняйте токен и повторяйте отправку с увеличивающимся интервалом. `upload(..., true)` делает только трёхсекундную паузу для видео/аудио и не гарантирует готовность. Автоматического повтора отправки в модуле нет.
+
+Источники: [POST /messages](https://dev.max.ru/docs-api/methods/POST/messages), [PUT /messages](https://dev.max.ru/docs-api/methods/PUT/messages), [медиафайлы](https://dev.max.ru/docs-api/use-cases/sending-messages/media), [POST /uploads](https://dev.max.ru/docs-api/methods/POST/uploads).
+
+Локальные проверки: `php tests/media.php /path/to/vendor/autoload.php`. Используются Yii2 и Guzzle MockHandler: проверяются сформированные HTTP-запросы, multipart, токены, удаление клавиатуры, сохранение медиа, ошибки и очистка файлов. Доставка в реальный MAX-чат этими проверками не подтверждается.
+
 ## Создание экземпляра
 
 `static create(?string $text = null, array $args = []): self`
